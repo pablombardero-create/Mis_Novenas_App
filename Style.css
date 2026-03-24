@@ -10,6 +10,7 @@
 /* 3. BODY */
 body {
   font-family: Arial, sans-serif;
+  font-size: 17px;
   min-height: 100vh;
   display: flex;
   justify-content: center;
@@ -70,7 +71,7 @@ button {
   max-width: 300px;
   margin: 10px auto;
   padding: 14px 20px;
-  font-size: 16px;
+  font-size: 18px;
   border: none;
   border-radius: 10px;
   background: white;
