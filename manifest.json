@@ -13,14 +13,10 @@
       "sizes": "512x512"
     }
   ],
-  "start_url": "index.html",
+  "start_url": "/Mis_Novenas_App/index.html",
+  "scope": "/Mis_Novenas_App/",
   "background_color": "#000000",
   "display": "standalone",
-  "scope": "/",
   "theme_color": "#000000",
-  "description": "Aplicación para rezar novenas y coronillas de manera sencilla y accesible.",
-  "permissions": [
-    "notifications"
-  ],
-  "gcm_sender_id": ""
+  "description": "Aplicación para rezar novenas y coronillas de manera sencilla y accesible."
 }
