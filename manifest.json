@@ -5,12 +5,12 @@
     {
       "src": "icono-192.png",
       "type": "image/png",
-      "sizes": "192x192"
+      "sizes": "1024x1024"
     },
     {
       "src": "icono-512.png",
       "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "1024x1024"
     }
   ],
   "start_url": "/Mis_Novenas_App/index.html",
