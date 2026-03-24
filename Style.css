@@ -1,5 +1,5 @@
 /* 1. RESET / BASE */
-* { box-sizing: border-box; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 /* 2. ROOT / VARIABLES */
 :root {
@@ -7,115 +7,157 @@
   --glass-bg: rgba(0,0,0,0.6);
 }
 
-/* 3. BODY (fondo global) */
+/* 3. BODY */
 body {
-margin:0;
-font-family: Arial, sans-serif;
-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
+  font-family: Arial, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  padding: 20px;
 }
 
-/* 4. PSEUDO-ELEMENTOS (antes que hijos) */
+/* 4. OVERLAY OSCURO DE FONDO */
 body::before {
-    content: '';
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: inherit;
-    z-index: -1;
+  content: '';
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 0;
 }
 
-/* 5. CONTAINERS */
+/* 5. CONTAINER */
 .container {
-background: rgba(0,0,0,0.6);
-padding:40px;
-border-radius:10px;
-text-align:center;
-max-height:90vh;
-overflow-y:auto;
-animation: aparecer 0.4s ease;
+  position: relative;
+  z-index: 1;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 36px 28px;
+  border-radius: 14px;
+  text-align: center;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: aparecer 0.4s ease;
 }
 
 /* 6. TIPOGRAFÍA */
 h1 {
-color:white;
-margin-bottom:30px;
+  color: white;
+  font-size: 1.8em;
+  margin-bottom: 24px;
+  line-height: 1.2;
+}
+
+h2 {
+  color: white;
+  font-size: 1.3em;
+  margin-bottom: 12px;
+}
+
+p {
+  color: white;
 }
 
 /* 7. BOTONES */
 button {
-display:block;
-width:200px;
-margin:10px auto;
-padding:15px;
-font-size:16px;
-border:none;
-border-radius:8px;
+  display: block;
+  width: 100%;
+  max-width: 300px;
+  margin: 10px auto;
+  padding: 14px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 10px;
+  background: white;
+  color: #222;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+button:active {
+  opacity: 0.75;
 }
 
 /* 8. CONTENIDO */
-.oracion{
-    color:white;
-    font-size:28px;
-    line-height:1.5;
-    margin-bottom:30px;
-    max-height:65vh;
-    overflow-y:auto;
-    text-align:center;
-    white-space: pre-line;
-  }
-.contador{
-    color:white;
-    font-size:20px;
-    margin-bottom:20px;
-  }
-.rosario{
-  color:white;
-  font-size:22px;
-  text-align:center;
-  margin-bottom:15px;
-  }
-.botones{
-  margin-top:20px;
-  }
-.letanias {
-    color:white;
-    font-size:28px;
-    line-height:1.5;
-    margin-bottom:30px;
-    max-height:65vh;
-    hyphens: auto;
-    overflow-y:auto;
-    text-align:justify;
-    white-space: pre-line;
-  }
-.texto-coronilla {
-    color: white;
-    font-size: 28px;
-    line-height: 1.4;
-    margin-bottom: 30px;
-    text-align: center; 
-    white-space: pre-line;
-}
-.texto-justificado {
-    color: white;
-    font-size: 22px;
-    line-height: 1.6;
-    margin-bottom: 30px;
-    text-align: justify; /* Crucial para textos largos */
-    white-space: pre-line;
-    padding: 0 15px;
-}
-/* 9. ANIMACIONES */
-@keyframes aparecer{
-  from{
-  opacity:0;
-  transform:translateY(10px);
-  }
-  to{
-  opacity:1;
-  transform:translateY(0);
-  }
+.oracion {
+  color: white;
+  font-size: 1.15em;
+  line-height: 1.7;
+  margin-bottom: 24px;
+  max-height: 60vh;
+  overflow-y: auto;
+  text-align: center;
+  white-space: pre-line;
 }
 
+.contador {
+  color: white;
+  font-size: 1em;
+  margin-bottom: 12px;
+  opacity: 0.85;
+}
+
+.rosario {
+  color: white;
+  font-size: 1.3em;
+  text-align: center;
+  margin-bottom: 14px;
+  letter-spacing: 4px;
+}
+
+.botones {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.botones button {
+  flex: 1 1 120px;
+  max-width: 160px;
+  margin: 0;
+}
+
+.letanias {
+  color: white;
+  font-size: 1.1em;
+  line-height: 1.7;
+  margin-bottom: 24px;
+  max-height: 60vh;
+  overflow-y: auto;
+  text-align: justify;
+  white-space: pre-line;
+  hyphens: auto;
+}
+
+.texto-coronilla {
+  color: white;
+  font-size: 1.2em;
+  line-height: 1.6;
+  margin-bottom: 24px;
+  text-align: center;
+  white-space: pre-line;
+}
+
+.texto-justificado {
+  color: white;
+  font-size: 1.05em;
+  line-height: 1.7;
+  margin-bottom: 24px;
+  text-align: justify;
+  white-space: pre-line;
+  padding: 0 8px;
+}
+
+/* 9. ANIMACIONES */
+@keyframes aparecer {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

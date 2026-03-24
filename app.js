@@ -55,7 +55,7 @@
 // Optimización de imagenes
     function setBackground(imagen) {
         document.body.style.backgroundImage = `url('${imagen}')`;
-        document.body.style.backgroundSize = "contain";
+        document.body.style.backgroundSize = "cover";
         document.body.style.backgroundPosition = "center";
         document.body.style.backgroundRepeat = "no-repeat";
     }
