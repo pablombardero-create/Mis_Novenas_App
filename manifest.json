@@ -1,0 +1,26 @@
+{
+  "short_name": "Novenas",
+  "name": "Mis Novenas en una App",
+  "icons": [
+    {
+      "src": "icono-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "icono-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "index.html",
+  "background_color": "#000000",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#000000",
+  "description": "Aplicación para rezar novenas y coronillas de manera sencilla y accesible.",
+  "permissions": [
+    "notifications"
+  ],
+  "gcm_sender_id": ""
+}
