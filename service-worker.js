@@ -1,15 +1,46 @@
-const SW_VERSION = "1.0.0";
+const SW_VERSION = "1.0.1";
+const CACHE_NAME = "novenas-cache-v1";
+const ARCHIVOS = [
+    "./index.html",
+    "./App.js",
+    "./novenas.js",
+    "./Style.css",
+    "./manifest.json",
+    "./icono-192.png",
+    "./icono-512.png",
+    "./Portada1.jpg",
+    "./Dolindo.jpg",
+    "./SagradoCorazonz.jpg",
+    "./Jesus_Divina_Misericordia.jpg",
+    "./EspirituSanto.jpg",
+    "./AngelCustodio.jpg",
+    "./Castidad.jpg"
+];
 
 // ─────────────────────────────────────────
 // INSTALACIÓN Y ACTIVACIÓN
 // ─────────────────────────────────────────
 
 self.addEventListener("install", event => {
+    event.waitUntil(
+        caches.open(CACHE_NAME).then(cache => cache.addAll(ARCHIVOS))
+    );
     self.skipWaiting();
 });
 
 self.addEventListener("activate", event => {
-    event.waitUntil(self.clients.claim());
+    event.waitUntil(
+        caches.keys().then(keys =>
+            Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
+        ).then(() => self.clients.claim())
+    );
+});
+
+// Responder desde caché si está disponible
+self.addEventListener("fetch", event => {
+    event.respondWith(
+        caches.match(event.request).then(cached => cached || fetch(event.request))
+    );
 });
 
 // ─────────────────────────────────────────
