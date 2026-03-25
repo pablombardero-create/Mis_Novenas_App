@@ -10,7 +10,7 @@ const ARCHIVOS = [
     "./icono-512.png",
     "./Portada1.jpg",
     "./Dolindo.jpg",
-    "./SagradoCorazonz.jpg",
+    "./SagradoCorazon.jpg",
     "./Jesus_Divina_Misericordia.jpg",
     "./EspirituSanto.jpg",
     "./AngelCustodio.jpg",
