@@ -14,8 +14,6 @@
     //Iniciar aplicación
     const app = document.getElementById("app");
     mostrarInicio();
-    setInterval(revisarRecordatorios, 60000); // cada minuto
-    revisarRecordatorios(); // al cargar
     async function activarPantalla(){
     try{
         wakeLock = await navigator.wakeLock.request('screen');
