@@ -87,6 +87,7 @@ button:active {
 
 /* 8. CONTENIDO */
 .oracion {
+  font-family: 'Palatino Linotype', Palatino, serif;
   color: white;
   font-size: 1.15em;
   line-height: 1.7;
@@ -105,11 +106,15 @@ button:active {
 }
 
 .rosario {
+  font-family: 'Palatino Linotype', Palatino, serif;
   color: white;
-  font-size: 1.3em;
+  font-size: 1.15em;
+  line-height: 1.7;
+  margin-bottom: 24px;
+  max-height: 60vh;
+  overflow-y: auto;
   text-align: center;
-  margin-bottom: 14px;
-  letter-spacing: 4px;
+  white-space: pre-line;
 }
 
 .botones {
@@ -127,32 +132,40 @@ button:active {
 }
 
 .letanias {
+  font-family: 'Palatino Linotype', Palatino, serif;
   color: white;
-  font-size: 1.1em;
+  font-size: 1.15em;
+  line-height: 1.7;
+  margin-bottom: 24px;
+  max-height: 60vh;
+  overflow-y: auto;
+  text-align: justify;
+  white-space: pre-line;  
+  hyphens: auto;
+}
+
+.texto-coronilla {
+  font-family: 'Palatino Linotype', Palatino, serif;
+  color: white;
+  font-size: 1.15em;
+  line-height: 1.7;
+  margin-bottom: 24px;
+  max-height: 60vh;
+  overflow-y: auto;
+  text-align: center;
+  white-space: pre-line;
+}
+
+.texto-justificado {
+  font-family: 'Palatino Linotype', Palatino, serif;
+  color: white;
+  font-size: 1.15em;
   line-height: 1.7;
   margin-bottom: 24px;
   max-height: 60vh;
   overflow-y: auto;
   text-align: justify;
   white-space: pre-line;
-  hyphens: auto;
-}
-
-.texto-coronilla {
-  color: white;
-  font-size: 1.2em;
-  line-height: 1.6;
-  margin-bottom: 24px;
-  text-align: center;
-  white-space: pre-line;
-}
-
-.texto-justificado {
-  color: white;
-  font-size: 1.05em;
-  line-height: 1.7;
-  margin-bottom: 24px;
-  text-align: justify;
   white-space: pre-line;
   padding: 0 8px;
 }

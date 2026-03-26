@@ -174,28 +174,32 @@ function mostrarLista(){
         let contador = "";
         let puntos = "";
             // LÓGICA DE DETECCIÓN DE REPETICIONES
-                // 1. Contamos cuántas oraciones iguales hay hacia atrás
-                    let numActual = 0;
-                    let i = pasoCoronilla;
-                    while(i >= 0 && pasos[i] === texto) {
-                    numActual++;
-                    i--;
+                let numActual = 0;
+                let i = pasoCoronilla;
+                while(i >= 0 && pasos[i] === texto) {
+                numActual++;
+                i--;
+                }
+                let j = pasoCoronilla + 1;
+                while(j < pasos.length && pasos[j] === texto) {
+                j++;
+                }
+                let totalRepeticiones = numActual + (j - (pasoCoronilla + 1));
+                if(totalRepeticiones > 1) {
+                    contador = `Repetición ${numActual} de ${totalRepeticiones}`;
+                    for(let k = 1; k <= totalRepeticiones; k++){
+                    puntos += (k <= numActual) ? "● " : "○ ";
                     }
-                // 2. Contamos cuántas oraciones iguales hay hacia adelante para saber el total
-                    let j = pasoCoronilla + 1;
-                    while(j < pasos.length && pasos[j] === texto) {
-                    j++;
-                    }
-                    let totalRepeticiones = numActual + (j - (pasoCoronilla + 1));
-                // 3. Solo mostramos el contador si hay más de una repetición (evita contar títulos o preces sueltas)
-                    if(totalRepeticiones > 1) {
-                        contador = `Repetición ${numActual} de ${totalRepeticiones}`;
-                        for(let k = 1; k <= totalRepeticiones; k++){
-                        puntos += (k <= numActual) ? "● " : "○ ";
-                        }
-                    }
-        // Renderizado en pantalla
-            app.innerHTML = `
+                }
+        // Si ya existe el contenedor, solo actualizamos contador y bolitas
+        const contenedorExistente = document.querySelector('.texto-coronilla');
+        if(contenedorExistente && contenedorExistente.textContent.trim() === texto.trim()){
+            document.querySelector('.contador').textContent = contador;
+            document.querySelector('.rosario').textContent = puntos;
+            return;
+        }
+        // Primera vez o texto distinto → renderizado completo
+        app.innerHTML = `
             <div class="container">
                 <div class="contador">${contador}</div>
                 <div class="rosario">${puntos}</div>
@@ -208,7 +212,6 @@ function mostrarLista(){
             </div>
             `;
         }
-
     // Funciones navegación
         function siguientePasoCoronilla(){
             let pasos = contenidoNovenas[coronillaActual].coronilla;

@@ -2,7 +2,7 @@
 const novenas = [
 {
 id: "abandono",
-nombre: "Del Abandono (Jesús, ocúpate Tú)",
+nombre: "Del Abandono",
 imagen: "Dolindo.jpg",
 tieneOracion: true,
 tieneLetanias: false
@@ -221,8 +221,8 @@ oculta: true
         const Misterio4AngelCustodio = `N. protégeme, pues el Padre me encomendó a tu cuidado`
         const Misterio5AngelCustodio = `N. cuidame para que podamos algún día reconocernos con alegría en el Reino de los Cielos`
         // Oraciones
-        const OracionBerchmansAngelCustodio = `Ángel Santo, amado de Dios, que después de haberme tomado, por disposición divina, bajo vuestra bienaventurada guarda, jamás cesáis de defenderme, de iluminarme y de dirigirme: yo os venero como a protector, os amo como a custodio; me someto a vuestra dirección y me entrego todo a Vos, para ser de Vos gobernado. Os ruego, por lo tanto, y por amor de Jesucristo os suplico, que, cuando sea ingrato para con Vos y obstinadamente sordo a vuestras inspiraciones, no queráis, a pesar de esto, abandonarme; antes al contrario, ponedme pronto en el recto camino, si me he desviado de él; enseñadme, si soy ignorante; levantadme, si he caído; sostenedme, si estoy en peligro, y conducidme al cielo para poseer en el una felicidad eterna. Amén.`
-        const OracionFinalCoronillaAngelCustodio = `Ángel de Dios, que eres mi custodio, pues la bondad divina me ha encomendado a ti, ilumíname, dirígeme, guárdame. Amén.`
+        const OracionBerchmansAngelCustodio = `Ángel Santo, amado de Dios, que después de haberme tomado, por disposición divina, bajo vuestra bienaventurada guarda, jamás cesáis de defenderme, de iluminarme y de dirigirme: yo os venero como a protector, os amo como a custodio; me someto a vuestra dirección y me entrego todo a Vos, para ser de Vos gobernado. Os ruego, por lo tanto, y por amor de Jesucristo os suplico, que, cuando sea ingrato para con Vos y obstinadamente sordo a vuestras inspiraciones, no queráis, a pesar de esto, abandonarme; antes al contrario, ponedme pronto en el recto camino, si me he desviado de él; enseñadme, si soy ignorante; levantadme, si he caído; sostenedme, si estoy en peligro, y conducidme al cielo para poseer en él una felicidad eterna. Amén`
+        const OracionFinalCoronillaAngelCustodio = `Ángel de Dios, que eres mi custodio, pues la bondad divina me ha encomendado a ti, ilumíname, dirígeme, guárdame. Amén`
     // Oraciones específicas de la novena para pedir la castidad
         // Coronilla
             const PurezaJesus1 = `Señor Jesús, tú has recibido los latigazos de la lujuria de mí, para que yo reciba la pureza de Ti`
@@ -308,27 +308,22 @@ const coronillaAbandono = [
     // INICIO
     "Señor, sea bendito tu nombre y hágase tu voluntad.",
         // MISTERIO 1 (Jesús - 10 veces)
-    "1er Misterio",
     ...Array(10).fill(AbandonoJesus),
     GLORIA,
     AbandonoJesus2,
         // MISTERIO 2 (María - 10 veces)
-    "2º Misterio",
     ...Array(10).fill(AbandonoMaria),
     AVE_MARIA,
     AbandonoMaria2,
         // MISTERIO 3 (Jesús)
-    "3er Misterio",
     ...Array(10).fill(AbandonoJesus),
     GLORIA,
     AbandonoJesus2,
         // MISTERIO 4 (María)
-    "4º Misterio",
     ...Array(10).fill(AbandonoMaria),
     AVE_MARIA,
     AbandonoMaria2,
         // MISTERIO 5 (Jesús)
-    "5º Misterio",
     ...Array(10).fill(AbandonoJesus),
     GLORIA,
     AbandonoJesus2,
@@ -547,23 +542,18 @@ const coronillaSagradoCorazon = [
     // INICIO
     "Jesús, manso y humilde de Corazón, haz mi corazón semejante al Tuyo",
         // MISTERIO 1 
-    "1er Misterio",
     ...Array(10).fill("Sagrado Corazón de Jesús: En Ti confío"),
    "Inmaculado Corazón de María: Sé la Salvación del alma mía",
         // MISTERIO 2 
-    "2º Misterio",
-     ...Array(10).fill("Sagrado Corazón de Jesús: En Ti confío"),
+    ...Array(10).fill("Sagrado Corazón de Jesús: En Ti confío"),
    "Inmaculado Corazón de María: Sé la Salvación del alma mía",
         // MISTERIO 3 
-    "3er Misterio",
     ...Array(10).fill("Sagrado Corazón de Jesús: En Ti confío"),
    "Inmaculado Corazón de María: Sé la Salvación del alma mía",
         // MISTERIO 4 
-    "4º Misterio",
     ...Array(10).fill("Sagrado Corazón de Jesús: En Ti confío"),
     "Inmaculado Corazón de María: Sé la Salvación del alma mía",
         // MISTERIO 5 
-    "5º Misterio",
     ...Array(10).fill("Sagrado Corazón de Jesús: En Ti confío"),
     "Inmaculado Corazón de María: Sé la Salvación del alma mía",
         // FINAL
@@ -787,27 +777,22 @@ const coronillaDivinaMisericordia = [
     // INICIO
     "Misericodia Divina, en Ti confío",
         // MISTERIO 1 
-    "1er Misterio",
     PadreEterno,
     ...Array(10).fill(SuPasion),
     SantoDios,
         // MISTERIO 2
-    "2º Misterio",
     PadreEterno,
     ...Array(10).fill(SuPasion),
     SantoDios,
         // MISTERIO 3
-    "3er Misterio",
     PadreEterno,
     ...Array(10).fill(SuPasion),
     SantoDios,
         // MISTERIO 4
-    "4º Misterio",
     PadreEterno,
     ...Array(10).fill(SuPasion),
     SantoDios,
         // MISTERIO 5
-    "5º Misterio",
     PadreEterno,
     ...Array(10).fill(SuPasion),
     SantoDios,
@@ -1010,25 +995,20 @@ const coronillaEspirituSanto = [
     // INICIO
     SecuenciaPentecostes,
         // MISTERIO 1 
-    "1er Misterio",
-    ...Array(10).fill(VenPorMaria),
-   QueHare,
+        ...Array(10).fill(VenPorMaria),
+        QueHare,
         // MISTERIO 2 
-    "2º Misterio",
-     ...Array(10).fill(VenPorMaria),
-   QueHare,
+        ...Array(10).fill(VenPorMaria),
+        QueHare,
         // MISTERIO 3 
-    "3er Misterio",
-    ...Array(10).fill(VenPorMaria),
-   QueHare,
+        ...Array(10).fill(VenPorMaria),
+        QueHare,
         // MISTERIO 4 
-    "4º Misterio",
-    ...Array(10).fill(VenPorMaria),
-    QueHare,
+        ...Array(10).fill(VenPorMaria),
+        QueHare,
         // MISTERIO 5 
-    "5º Misterio",
-    ...Array(10).fill(VenPorMaria),
-    QueHare,
+        ...Array(10).fill(VenPorMaria),
+        QueHare,
         // FINAL
     PADRE_NUESTRO,
     AVE_MARIA,
@@ -1174,31 +1154,26 @@ const coronillaAngelCustodio = [
     // INICIO
     SEÑOR_MIO,
         // MISTERIO 1 
-    "1er Misterio",
-    "Querido Padre, gracias por el Custodio que me has dado, que me acompaña en mis caminos para que no me pierda en las seducciones del mundo.",
-    ...Array(10).fill(Misterio1AngelCustodio),
-   "Gracias querido N. pues nunca me abandonas",
+        "Querido Padre, gracias por el Custodio que me has dado, que me acompaña en mis caminos para que no me pierda en las seducciones del mundo.",
+        ...Array(10).fill(Misterio1AngelCustodio),
+        "Gracias querido N. pues nunca me abandonas",
         // MISTERIO 2 
-    "2º Misterio",
-    "Querido Padre, gracias por el Custodio que me has dado, que me da fuerzas para vencer en el Buen Combate, para huir en el pecado y crecer en la virtud",
-     ...Array(10).fill(Misterio2AngelCustodio),
-   "Gracias querido N. pues nunca me dejas en el combate",
+        "Querido Padre, gracias por el Custodio que me has dado, que me da fuerzas para vencer en el Buen Combate, huir en el pecado y crecer en la virtud",
+        ...Array(10).fill(Misterio2AngelCustodio),
+        "Gracias querido N. pues nunca me dejas en el combate",
         // MISTERIO 3 
-    "3er Misterio",
-    "Querido Padre, gracias por el Custodio que me has dado, que vigila mis pasos para adecuerlos a los tuyos y me asiste para que ante la tribulación no huya de tu voluntad.",
-    ...Array(10).fill(Misterio3AngelCustodio),
-   "Gracias querido N. pues me vigilas noche y día",
+        "Querido Padre, gracias por el Custodio que me has dado, que vigila mis pasos para adecuerlos a los tuyos y me asiste para que, ante la tribulación, no huya de tu voluntad.",
+        ...Array(10).fill(Misterio3AngelCustodio),
+        "Gracias querido N. pues me vigilas noche y día",
         // MISTERIO 4 
-    "4º Misterio",
-    "Querido Padre, gracias por el Custodio que me has dado, que me protege también en lo humano, preserva mis pies de la caída y defiende mi cuerpo, alma y espíritu frente a todo mal",
-    ...Array(10).fill(Misterio4AngelCustodio),
-    "Gracias querido N. pues nunca has dejado de protegerme",
+        "Querido Padre, gracias por el Custodio que me has dado, que me protege también en lo humano, preserva mis pies de la caída y defiende mi cuerpo, alma y espíritu frente a todo mal",
+        ...Array(10).fill(Misterio4AngelCustodio),
+        "Gracias querido N. pues nunca has dejado de protegerme",
         // MISTERIO 5 
-    "5º Misterio",
-    "Querido Padre, gracias por el Custodio que me has dado, compañero en esta vida con el objeto de poder encontrarnos en la Eterna",
-    ...Array(10).fill(Misterio5AngelCustodio),
-    "Gracias querido N. ¡Que ganas tengo de que nos veamos!",
-        // FINAL
+        "Querido Padre, gracias por el Custodio que me has dado, compañero en esta vida con el objeto de poder encontrarnos en la Eterna",
+        ...Array(10).fill(Misterio5AngelCustodio),
+        "Gracias querido N. ¡Que ganas tengo de que nos veamos!",
+    // FINAL
         PADRE_NUESTRO,
         AVE_MARIA,
         GLORIA,
@@ -1216,8 +1191,8 @@ const novenaAngelCustodio = [
         {
             tipo: "texto",
             texto: `Día 1
-            ¡Oh buen Ángel custodio! ayudadme a dar gracias al Altísimo por haberse dignado destinaros para mi guarda.
-            Os pido que por intercesión de María, me alcancéis de Dios un fervoroso espíritu y la práctica de una oración constante para agradecer a Dios todos sus beneficios, y especialmente el de teneros por celestial custodio mío.`,
+            ¡Oh buen Ángel custodio! ayúdame a dar gracias al Altísimo por haberse dignado destinarte a mi guarda.
+            Te pido que por intercesión de María, me alcances de Dios un fervoroso espíritu y la práctica de una oración constante para agradecer a Dios todos sus beneficios, y especialmente el de tenerte por celestial custodio mío`,
         }
     ]
   },
@@ -1231,8 +1206,8 @@ const novenaAngelCustodio = [
         {
             tipo: "texto",
             texto: `Día 2
-            ¡Oh buen Ángel custodio! ayudadme a dar gracias al Altísimo por haberse dignado destinaros para mi guarda.
-            Os pido que por intercesión de María, me alcancéis de Dios un fervoroso espíritu y la práctica de una oración constante para agradecer a Dios todos sus beneficios, y especialmente el de teneros por celestial custodio mío.`,
+            ¡Oh Príncipe celestial!, dígnate obtenerme el perdón de todas las ofensas que os he hecho a Dios y a ti, despreciando vuestras amenazas consejos.
+            Te pido que, por intercesión de María, me alcances de Dios un verdadero dolor de los pecados, que me obtenga el perdón de todas las faltas y caídas de la vida pasada`,
         }
     ]
   },
@@ -1246,8 +1221,8 @@ const novenaAngelCustodio = [
         {
             tipo: "texto",
             texto: `Día 3
-            ¡Oh mi Tutor amoroso!, infundid en mi alma un profundo respeto hacia Vos, de tal manera que jamás tenga el atrevimiento de hacer cosa alguna que os desagrade.
-            Os pido que, por intercesión de María, me alcancéis de Dios el recuerdo de la presencia divina y el respeto a vuestra presencia continua, las cuales han de guardarme del pecado.`,
+            ¡Oh mi Tutor amoroso!, infunde en mi alma un profundo respeto hacia ti, de tal manera que jamás tenga el atrevimiento de hacer cosa alguna que te desagrade.
+            Te pido que, por intercesión de María, me alcances de Dios el recuerdo de la presencia divina y el respeto a tu presencia continua, las cuales han de guardarme del pecado`,
         }
     ]
   },
@@ -1261,8 +1236,8 @@ const novenaAngelCustodio = [
         {
             tipo: "texto",
             texto: `Día 4
-            ¡Oh Médico compasivo!, enseñadme el remedio y dadme el auxilio para curar mis malos hábitos y tantas miserias como oprimen mi alma.
-            Os pido que, por intercesión de María, me alcancéis de Dios un verdadero espíritu de mortificación, con el cual domine mis malas pasiones y la sensualidad, y obtenga la paz y la libertad de espíritu, juntamente con las demás virtudes`,
+            ¡Oh Médico compasivo!, enséñame el remedio y dame el auxilio para curar mis malos hábitos y tantas miserias como oprimen mi alma.
+            Te pido que, por intercesión de María, me alcances de Dios un verdadero espíritu de mortificación, con el cual domine mis malas pasiones y la sensualidad, y obtenga la paz y la libertad de espíritu, juntamente con las demás virtudes`,
         }
     ]
   },
@@ -1276,8 +1251,8 @@ const novenaAngelCustodio = [
         {
             tipo: "texto",
             texto: `Día 5
-            ¡Oh, mi Guía fiel!, alcanzadme fuerza para vencer todos los obstáculos que se encuentren en el camino de la existencia y para sufrir pacientemente las tribulaciones de esta miserable vida.
-            Os pido que, por intercesión de María, me alcancéis de Dios una verdadera paciencia y conformidad en todas las contrariedades y penas de la vida que Dios pueda permitir para mi santificación.`,
+            ¡Oh, mi Guía fiel!, alcánzame fuerza para vencer todos los obstáculos que se encuentren en el camino de la existencia y para sufrir pacientemente las tribulaciones de esta miserable vida.
+            Te pido que, por intercesión de María, me alcances de Dios una verdadera paciencia y conformidad en todas las contrariedades y penas de la vida que Dios pueda permitir para mi santificación`,
         }       
     ] 
 },
@@ -1291,8 +1266,8 @@ const novenaAngelCustodio = [
         {
             tipo: "texto",
             texto: `Día 6
-            ¡Oh Intercesor eficaz cerca de Dios!, alcanzadme la gracia de seguir prontamente vuestras santas inspiraciones y de conformar, en todo y para siempre, mi voluntad a la de Dios.
-            Os pido que, por la intercesión de María, me alcancéis de Dios una obediencia absoluta a todos mis superiores, la cual me santifique por el cumplimiento de la voluntad divina en ella manifestada.`,
+            ¡Oh Intercesor eficaz cerca de Dios!, alcánzame la gracia de seguir prontamente tus santas inspiraciones y de conformar, en todo y para siempre, mi voluntad a la de Dios.
+            Te pido que, por la intercesión de María, me alcances de Dios una obediencia absoluta a todos mis superiores, la cual me santifique por el cumplimiento de la voluntad divina en ella manifestada`,
         }
     ]
   },
@@ -1306,8 +1281,8 @@ const novenaAngelCustodio = [
         {
             tipo: "texto",
             texto: `Día 7
-            ¡Oh Espíritu purísimo, encendido todo en amor de Dios!, alcanzadme este fuego divino, y al mismo tiempo una verdadera devoción a vuestra augusta Reina y buena Madre mía, la Virgen Santísima.
-            Os pido que, por intercesión de María, me obtengáis de Dios la caridad perfecta y la devoción a María, que sean para mi fuente abundantísima de méritos, camino segurísimo de salvación y el más dulce consuelo en la hora de la muerte.`,
+            ¡Oh Espíritu purísimo, encendido todo en amor de Dios!, alcánzame este fuego divino, y al mismo tiempo una verdadera devoción a tu augusta Reina y buena Madre mía, la Virgen Santísima.
+            Te pido que, por intercesión de María, me obtengas de Dios la caridad perfecta y la devoción a María, que sean para mí fuente abundantísima de méritos, camino segurísimo de salvación y el más dulce consuelo en la hora de la muerte`,
         }
     ]
   },
@@ -1321,8 +1296,8 @@ const novenaAngelCustodio = [
         {
             tipo: "texto",
             texto: `Día 8
-            ¡Oh invencible Protector!, asistidme a fin de corresponder dignamente a vuestro amor y a vuestros beneficios, y para trabajar con todas las fuerzas en promover vuestro culto y vuestra devoción.
-          Igualmente os pido que, por intercesión de María, me alcancéis de Dios un celo fervoroso para la práctica del bien y una fervorosa devoción angélica, que sean mi propia santificación y la del prójimo `,
+            ¡Oh invencible Protector!, asísteme a fin de corresponder dignamente a tu amor y a tus beneficios, y para trabajar con todas las fuerzas en promover tu culto y devoción.
+            Igualmente te pido que, por intercesión de María, me alcances de Dios un celo fervoroso para la práctica del bien y una fervorosa devoción angélica, que sean mi propia santificación y la del prójimo`,
         }
     ]
   },
@@ -1336,8 +1311,8 @@ const novenaAngelCustodio = [
         {
             tipo: "texto",
             texto: `Día 9
-            ¡Oh bienaventurado ministro del Altísimo!, alcanzadme de su misericordia infinita que llegue yo a ocupar un día uno de los tronos que dejaron vacíos los ángeles rebeldes.
-            Os pido que, por intercesión de María, me obtengáis de Dios la gracia de una santa muerte, confortada con los Santos Sacramentos, que me abra las puertas de la gloria eterna.`,
+            ¡Oh bienaventurado ministro del Altísimo!, alcánzame de su misericordia infinita que llegue yo a ocupar un día uno de los tronos que dejaron vacíos los ángeles rebeldes.
+            Te pido que, por intercesión de María, me obtengas de Dios la gracia de una muerte santa, confortado con los Santos Sacramentos, confesado y en Gracia, que me abra las puertas de la gloria eterna`,
         }
     ]
   },
@@ -1347,31 +1322,26 @@ const coronillaCastidad = [
     // INICIO
     BenditaTuPureza,
         // MISTERIO 1 (Jesús - 10 veces)
-    "1er Misterio",
-    PurezaJesus1,
-    ...Array(10).fill(PurezaJesus2),
-    PurezaJesus3,
+        PurezaJesus1,
+        ...Array(10).fill(PurezaJesus2),
+        PurezaJesus3,
         // MISTERIO 2 (María - 10 veces)
-    "2º Misterio",
-    PurezaMaria1,
-    ...Array(10).fill(PurezaMaria2),
-    PurezaMaria3,
+        PurezaMaria1,
+        ...Array(10).fill(PurezaMaria2),
+        PurezaMaria3,
         // MISTERIO 3 (Jesús)
-    "3er Misterio",
-    PurezaJesus1,
-    ...Array(10).fill(PurezaJesus2),
-    PurezaJesus3,
+        PurezaJesus1,
+        ...Array(10).fill(PurezaJesus2),
+        PurezaJesus3,
         // MISTERIO 4 (María)
-    "4º Misterio",
-    PurezaMaria1,
-    ...Array(10).fill(PurezaMaria2),
-    PurezaMaria3,
+        PurezaMaria1,
+        ...Array(10).fill(PurezaMaria2),
+        PurezaMaria3,
         // MISTERIO 5 (Jesús)
-    "5º Misterio",
-    PurezaJesus1,
-    ...Array(10).fill(PurezaJesus2),
-    PurezaJesus3,
-        // FINAL
+        PurezaJesus1,
+        ...Array(10).fill(PurezaJesus2),
+        PurezaJesus3,
+    // FINAL
     OracionEclesiastico
 ];
 
