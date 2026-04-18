@@ -773,10 +773,10 @@ function mostrarFelicitacion(id, dia) {
     const novena = novenas.find(n => n.id === id);
     app.innerHTML = `
     <div class="container">
-        <h1>🎉 ¡Enhorabuena!</h1>
+        <h1>¡Novena terminada!</h1>
         <p style="color:white; text-align:center; font-size:1.1em; margin: 20px 0;">
             Has completado la novena <strong>${novena.nombre}</strong>.<br><br>
-            Que esta novena haya sido una gracia para ti.
+            Que el Señor te conceda lo que has pedido.
         </p>
         <button onclick="mostrarInicio()">Volver al inicio</button>
     </div>
