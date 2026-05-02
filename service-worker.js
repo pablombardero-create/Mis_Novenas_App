@@ -1,10 +1,10 @@
-const SW_VERSION = "1.0.4";
-const CACHE_NAME = "novenas-cache-v1";
+const SW_VERSION = "1.1.0";
+const CACHE_NAME = "novenas-cache-" + SW_VERSION; // ✅ cambia con cada versión
 const ARCHIVOS = [
     "./index.html",
-    "./app.js",
-    "./novenas.js",
-    "./Style.css",
+    "./App.js",
+    "./Novenas.js",
+    "./style.css",
     "./manifest.json",
     "./icono-192.png",
     "./icono-512.png",
@@ -46,11 +46,6 @@ self.addEventListener("fetch", event => {
 // ─────────────────────────────────────────
 // MENSAJES DESDE LA APP
 // ─────────────────────────────────────────
-// La app le manda mensajes al SW para programar o cancelar recordatorios.
-// Formato del mensaje:
-//   { tipo: "programar", recordatorios: [...] }
-//   { tipo: "cancelar", idNovena: "abandono" }
-//   { tipo: "marcarRezado", idNovena: "abandono", dia: 3 }
 
 self.addEventListener("message", event => {
     const { tipo } = event.data;
@@ -69,19 +64,14 @@ self.addEventListener("message", event => {
 // ─────────────────────────────────────────
 // PROGRAMAR NOTIFICACIONES
 // ─────────────────────────────────────────
-// Recibe un array de objetos:
-// { idNovena, nombreNovena, timestamp, esRecordatorio }
-// esRecordatorio = true → es el aviso de "¿todavía no has rezado?"
 
 async function programarNotificaciones(recordatorios) {
-    // Comprobamos si el navegador soporta notificaciones programadas (Chrome Android)
     const soportaProgramadas = "showTrigger" in Notification.prototype;
 
     for (const r of recordatorios) {
         const tag = `novena_${r.idNovena}_${r.timestamp}`;
 
         if (soportaProgramadas) {
-            // ✅ Chrome Android: notificación programada real (funciona con app cerrada)
             await self.registration.showNotification(
                 r.esRecordatorio ? "¿Aún no has rezado hoy?" : "Momento de oración",
                 {
@@ -98,7 +88,6 @@ async function programarNotificaciones(recordatorios) {
                 }
             );
         } else {
-            // ⚠️ Fallback: guardamos en IndexedDB y revisamos con sync periódico
             await guardarRecordatorioPendiente(r);
         }
     }
@@ -115,20 +104,17 @@ async function cancelarNotificacionesNovena(idNovena) {
             n.close();
         }
     }
-    // También limpiamos las pendientes en IndexedDB
     await limpiarRecordatoriosPendientes(idNovena);
 }
 
 // ─────────────────────────────────────────
 // MARCAR DÍA COMO REZADO
 // ─────────────────────────────────────────
-// Cancela el recordatorio de 2h de ese día concreto
 
 async function marcarDiaRezado(idNovena, dia) {
     const notificaciones = await self.registration.getNotifications({ includeTriggered: true });
     for (const n of notificaciones) {
         if (n.data && n.data.idNovena === idNovena && n.data.esRecordatorio) {
-            // Buscamos si es el recordatorio de hoy
             const hoy = new Date().toISOString().split("T")[0];
             const fechaNot = new Date(n.data.timestamp).toISOString().split("T")[0];
             if (fechaNot === hoy) {
@@ -148,7 +134,6 @@ self.addEventListener("notificationclick", event => {
 
     event.waitUntil(
         self.clients.matchAll({ type: "window", includeUncontrolled: true }).then(clients => {
-            // Si la app ya está abierta, la enfocamos
             for (const client of clients) {
                 if (client.url.includes("index.html") && "focus" in client) {
                     client.focus();
@@ -156,7 +141,6 @@ self.addEventListener("notificationclick", event => {
                     return;
                 }
             }
-            // Si no está abierta, la abrimos
             if (self.clients.openWindow) {
                 return self.clients.openWindow(`index.html?novena=${idNovena}`);
             }
@@ -166,7 +150,6 @@ self.addEventListener("notificationclick", event => {
 
 // ─────────────────────────────────────────
 // FALLBACK: IndexedDB + Sync periódico
-// Para navegadores sin TimestampTrigger (Firefox, Safari, algunos Android)
 // ─────────────────────────────────────────
 
 function abrirDB() {
@@ -201,7 +184,6 @@ async function limpiarRecordatoriosPendientes(idNovena) {
     return new Promise((res, rej) => { tx.oncomplete = res; tx.onerror = rej; });
 }
 
-// Revisión periódica para el fallback (se activa cuando la app está abierta)
 self.addEventListener("periodicsync", event => {
     if (event.tag === "revisar-recordatorios") {
         event.waitUntil(revisarRecordatoriosFallback());
@@ -228,7 +210,6 @@ async function revisarRecordatoriosFallback() {
                         data: { idNovena: r.idNovena, timestamp: r.timestamp, esRecordatorio: r.esRecordatorio }
                     }
                 );
-                // Borramos el pendiente ya lanzado
                 const tx2 = db.transaction("pendientes", "readwrite");
                 tx2.objectStore("pendientes").delete(r.tag);
             }
