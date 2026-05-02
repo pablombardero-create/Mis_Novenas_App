@@ -40,6 +40,14 @@ tieneOracion: true,
 oculta: false
 },
 {
+id: "Perdon",
+nombre: "Para pedir perdón por los pecados",
+imagen: "Perdon.jpg",
+tieneOracion: true,
+tieneLetanias: true,
+oculta: true
+},
+{
 id: "castidad",
 nombre: "Para pedir la castidad",
 imagen: "Castidad.jpg",
@@ -299,6 +307,8 @@ oculta: true
                 entonces aceptarás los sacrificios rituales, 
                 ofrendas y holocaustos, 
                 sobre tu altar se inmolarán novillos.`
+        //Letanias
+            const LetaniasPenitenciales = `En proceso`
 //-------------------------------
 //Novenas
 //-------------------------------
@@ -333,7 +343,6 @@ const coronillaAbandono = [
     A través de ti y contigo quiero pertenecer completamente a Jesús 
     para siempre."`
 ];
-
 const novenaAbandono = [
     {
     dia: 1,
@@ -501,7 +510,6 @@ Trinidad Santa, un solo Dios,
 
 Corazón de Jesús, Hijo del Eterno Padre, 
 Corazón de Jesús, formado en el seno de la Virgen Madre por el Espíritu Santo, 
-Corazón de Jesús, formado en el seno de la Virgen Madre por el  Espíritu Santo, 
 Corazón de Jesús, unido sustancialmente al Verbo de Dios, 
 Corazón de Jesús, templo santo de Dios, 
 Corazón de Jesús, tabernáculo del Altísimo, 
@@ -1498,44 +1506,226 @@ const novenaCastidad = [
     ]
   }
 ];
+// Novena del Perdon
+const coronillaPerdon = [
+    // INICIO
+    SEÑOR_MIO,
+        // MISTERIO 1 (Jesús - 10 veces)
+        ...Array(10).fill(OraciondelCorazon1),
+        // MISTERIO 2 (María - 10 veces)
+        ...Array(10).fill(OraciondelCorazon2),
+        // MISTERIO 3 (Jesús)
+        ...Array(10).fill(OraciondelCorazon1),
+        // MISTERIO 4 (María)
+        ...Array(10).fill(OraciondelCorazon2),
+        // MISTERIO 5 (Jesús)
+        ...Array(10).fill(OraciondelCorazon1),
+    // FINAL
+    SantoDios
+];
+const novenaPerdon = [
+    {
+    dia: 1,
+    contenido: [
+        {
+            tipo: "texto",
+            texto: `1º Mandamiento - Amarás a Dios sobre todas las cosas
+                Sin embargo, todo eso que para mí era ganancia, lo consideré pérdida a causa de Cristo. Más aún: todo lo considero pérdida comparado con la excelencia del conocimiento de Cristo Jesús, mi Señor. Por él lo perdí todo, y todo lo considero basura con tal de ganar a Cristo y ser hallado en él, no con una justicia mía, la de la ley, sino con la que viene de la fe de Cristo, la justicia que viene de Dios y se apoya en la fe. Todo para conocerlo a él, y la fuerza de su resurrección, y la comunión con sus padecimientos, muriendo su misma muerte, con la esperanza de llegar a la resurrección de entre los muertos. No es que ya lo haya conseguido o que ya sea perfecto: yo lo persigo, a ver si lo alcanzo como yo he sido alcanzado por Cristo. Hermanos, yo no pienso haber conseguido el premio. Solo busco una cosa: olvidándome de lo que queda atrás y lanzándome hacia lo que está por delante, corro hacia la meta, hacia el premio, al cual me llama Dios desde arriba en Cristo Jesús`,
+        },
+        {
+            tipo: "texto",
+            texto: `Señor, tú nos has dicho que no se puede servir a dos señores, porque amando a uno despreciamos al otro... ciertamente no podemos amarte a Ti y al mundo. Pablo considera pérdida todo lo que no es Cristo, todos sus logros y afanes pasados. Todo es basura en comparación de ganar a Cristo. Esto es amarte sobre todas las cosas, olvidarme de mis éxitos, de mis afectos, de mis comodidades... olvidarme del mundo y amarte solo a Ti. Y entonces se es libre: libre para seguirte, libre para anunciarte, libre de mí mismo, libre del pecado. Libre como los hijos de Dios. Perdóname porque ciertamente no te amo sobre todas las cosas. Amo demasiado el mundo, me seduce e intento ir a dos aguas. Santa Teresa hablaba de los duro de ese combate entre Dios y el mundo. También yo estoy harto de este combate: ¡Todo tuyo! ¡Amarte sobre todas las cosas! Perdóname, Padre mío, por todas las veces que no lo he cumplido y dame un corazón como el de Cristo, capaz al menos de cumplir el primer mandamiento: Amarás al Señor sobre todas las cosas`,
+        }
+    ]
+  },
+  {
+    dia: 2,
+    contenido: [
+        {
+            tipo: "texto",
+            texto: `2º Mandamiento - No tomarás el nombre de Dios en vano
+                Tened entre vosotros los sentimientos propios de Cristo Jesús. 
+                El cual, siendo de condición divina, 
+                no retuvo ávidamente el ser igual a Dios; 
+                al contrario, se despojó de sí mismo 
+                tomando la condición de esclavo, 
+                hecho semejante a los hombres. 
+                Y así, reconocido como hombre por su presencia, 
+                se humilló a sí mismo, 
+                hecho obediente hasta la muerte, 
+                y una muerte de cruz. 
+                Por eso Dios lo exaltó sobre todo 
+                y le concedió el Nombre-sobre-todo-nombre; 
+                de modo que al nombre de Jesús 
+                toda rodilla se doble 
+                en el cielo, en la tierra, en el abismo, 
+                y toda lengua proclame: 
+                Jesucristo es Señor, 
+                para gloria de Dios Padre.`,
+        },
+        {
+            tipo: "texto",
+            texto: `No tomarás el nombre de Dios en vano. No solamente es no jurar, o no blasfemar (de lo que rebosa el corazón hablara la boca ¡Qué debe haber en el corazón del pobre blasfemo!). No tomar el nombre de Dios en vano es ante todo bendecir este Nombre-sobre-todo-nombre. Yo soy cristiano, llevo el nombre de Cristo, cada vez que como cristiano vivo como escándalo estoy mancillando el nombre de Cristo, tomándolo en vano en mi propia carne. Perdóname Señor por todas las veces que tomo tu nombre en vano, que lo mancillo. Bien con mi palabra, bien con mis actos, bien con mis pensamientos. De lo que rebosa el corazón habla la boca, si te amo sobre todas las cosas ¿Cómo mancillar tu nombre? Ayúdame, Amor mío, a glorificar tu nomnbre. ¡Santificado sea tu nombre! Y no solo el tuyo, el de todo lo que te rodea. Ayúdame a respetar y venerar lo sagrado, todo lo que te circunda, y así portar con orgullo sobre mi carne este Nombre-sobre-todo-nombre`,
+        },
+    ]
+   },
+   {
+    dia: 3,
+    contenido: [
+        {
+            tipo: "texto",
+            texto: `3º Mandamiento - Santificarás las fiestas
+                 8Recuerda el día del sábado para santificarlo. 9Durante seis días trabajarás y harás todas tus tareas, 10pero el día séptimo es día de descanso, consagrado al Señor, tu Dios. No harás trabajo alguno, ni tú, ni tu hijo, ni tu hija, ni tu esclavo, ni tu esclava, ni tu ganado, ni el emigrante que reside en tus ciudades. 11Porque en seis días hizo el Señor el cielo, la tierra, el mar y lo que hay en ellos; y el séptimo día descansó. Por eso bendijo el Señor el sábado y lo santificó.`,
+        },
+        {
+            tipo: "texto",
+            texto: `Hacer meditación`,
+        },
+    ]
+  },
+  {
+    dia: 4,
+    contenido: [
+        {
+            tipo: "texto",
+            texto: `4º Mandamiento - Honrarás a tu padre y a tu madre
+                Buscar texto`,
+        },
+        {
+            tipo: "texto",
+            texto: `Hacer meditación`,
+        },
+        ]
+  },
+  {
+    dia: 5,
+    contenido: [
+        {
+            tipo: "texto",
+            texto: `5º Mandamiento - No matarás
+                Buscar texto`,
+        },
+        {
+            tipo: "texto",
+            texto: `Hacer meditación`,
+        },
+    ]
+  },
+  {
+    dia: 6,
+    contenido: [
+        {
+            tipo: "texto",
+            texto: `6º Mandamiento - No cometerás actos impuros
+            Buscar texto`,
+        },
+        {
+            tipo: "texto",
+            texto: `Hacer meditación`,
+        },
+    ]
+  },
+  {
+    dia: 7,
+    contenido: [
+        {
+            tipo: "texto",
+            texto: `7º Mandamiento - No robarás
+            Buscar texto`,
+        },
+        {
+            tipo: "texto",
+            texto: `Hacer meditación`,
+        },
+    ]
+  },
+  {
+    dia: 8,
+    contenido: [
+        {
+            tipo: "texto",
+            texto: `8º Mandamiento - No darás falso testimonio ni mentirás
+                Buscar texto`,
+        },
+        {
+            tipo: "texto",
+            texto: `Hacer meditación`,
+        },
+    ]
+  },
+  {
+    dia: 9,
+    contenido: [
+        {
+            tipo: "texto",
+            texto: `9º Mandamiento - No consentirás pensamientos ni deseos impuros
+                Buscar texto`,
+        },
+        {
+            tipo: "texto",
+            texto: `Hacer meditación`,
+        },
+    ]
+   },
+   {
+    dia: 10,
+    contenido: [
+        {
+            tipo: "texto",
+            texto: `10º Mandamiento - No codiciarás los bienes agenos
+                Buscar texto`,
+        },
+        {
+            tipo: "texto",
+            texto: `Hacer meditación`,
+        },
+    ]
+    },
+]
 
 //Agrupación del contenido de las novenas
 const contenidoNovenas = {
-  abandono: {
-    coronilla: coronillaAbandono,
-    novena: novenaAbandono,
-    oracion: oracionAbandono, 
-    letanias: null
-  },
-  sagrado_corazon: {
-    coronilla: coronillaSagradoCorazon,
-    novena: novenaSagradoCorazon,
-    oracion: oracionSagradoCorazon,
-    letanias: letaniasSagradoCorazon
-  },
-  divina_misericordia: {
-    coronilla: coronillaDivinaMisericordia,
-    novena: novenaDivinaMisericordia,
-    oracion: null,
-    letanias: letaniasDivinaMisericordia
-  },
-  espiritu_santo: {
-    coronilla: coronillaEspirituSanto,
-    novena: novenaEspirituSanto,
-    oracion: oracionEspirituSanto,
-    letanias: letaniasEspirituSanto
-  },
-  angel_custodio: {
-    coronilla: coronillaAngelCustodio,
-    novena: novenaAngelCustodio,
-    oracion: oracionAngelCustodio,
-    letanias: null
-  },
+    abandono: {
+        coronilla: coronillaAbandono,
+        novena: novenaAbandono,
+        oracion: oracionAbandono, 
+        letanias: null
+    },
+    sagrado_corazon: {
+        coronilla: coronillaSagradoCorazon,
+        novena: novenaSagradoCorazon,
+        oracion: oracionSagradoCorazon,
+        letanias: letaniasSagradoCorazon
+    },
+    divina_misericordia: {
+        coronilla: coronillaDivinaMisericordia,
+        novena: novenaDivinaMisericordia,
+        oracion: null,
+        letanias: letaniasDivinaMisericordia
+    },
+    espiritu_santo: {
+        coronilla: coronillaEspirituSanto,
+        novena: novenaEspirituSanto,
+        oracion: oracionEspirituSanto,
+        letanias: letaniasEspirituSanto
+    },
+    angel_custodio: {
+        coronilla: coronillaAngelCustodio,
+        novena: novenaAngelCustodio,
+        oracion: oracionAngelCustodio,
+        letanias: null
+    },
     castidad: {
-    coronilla: coronillaCastidad,
-    novena: novenaCastidad,
-    oracion: null,
-    letanias: null
-  },
+        coronilla: coronillaCastidad,
+        novena: novenaCastidad,
+        oracion: null,
+        letanias: null
+    },
+    Perdon: {
+        coronilla: coronillaPerdon,
+        novena: novenaPerdon,
+        oracion: Salmo50,
+        letanias: LetaniasPenitenciales
+    }
 };
 

@@ -42,13 +42,6 @@
         secuenciaActual = null;
         mostrarInicio();
     }
-// Guardar día actual
-    //function guardarDia(idNovena, dia) {
-        //  localStorage.setItem(`dia${idNovena}`, dia);
-    //}
-    //function cargarDia(idNovena) {
-        //  return parseInt(localStorage.getItem(`dia${idNovena}`)) || 0;
-    //}
 
 // Optimización de imagenes
     function setBackground(imagen) {
@@ -57,6 +50,7 @@
         document.body.style.backgroundPosition = "center";
         document.body.style.backgroundRepeat = "no-repeat";
     }
+
 // Novenas ocultas - detección de 5 toques en el título
 function contarToque(){
     tapCount++;
@@ -69,7 +63,7 @@ function contarToque(){
             alert("Novenas especiales bloqueadas.");
         } else {
             localStorage.setItem("novenasOcultas", "true");
-            alert("\u2728 Novenas especiales desbloqueadas.");
+            alert("✨ Novenas especiales desbloqueadas.");
         }
         mostrarInicio();
         return;
@@ -110,14 +104,12 @@ function mostrarLista(){
     const desbloqueado = localStorage.getItem("novenasOcultas") === "true";
     const visibles = novenas.filter(n => !n.oculta || desbloqueado);
     let lista = "<h1>Lista de novenas</h1>";
-    if(desbloqueado) lista += `<p style="color:#ffd700; font-size:0.85em; margin-bottom:8px;">\u2728 Novenas especiales visibles</p>`;
+    if(desbloqueado) lista += `<p style="color:#ffd700; font-size:0.85em; margin-bottom:8px;">✨ Novenas especiales visibles</p>`;
     visibles.forEach(novena => {
         lista += `<button onclick="abrirNovena('${novena.id}')">${novena.nombre}</button>`;
     });
     lista += `<br><button onclick="mostrarInicio()">Volver</button>`;
     app.innerHTML = `<div class="container">${lista}</div>`;
-
-    // Cambiar imagen de fondo a la portada
     setBackground('Portada1.jpg')
 }
 
@@ -129,7 +121,6 @@ function mostrarLista(){
         function iniciarCoronillaSecuencia(id){
         coronillaActual = id;
         pasoCoronilla = 0;
-        
     mostrarPasoCoronilla();
 }
     // Empezar coronilla
@@ -246,6 +237,7 @@ function mostrarLista(){
             mostrarPasoCoronilla();
             }
         }
+
 // --------------------
 // REZAR Novena
 // --------------------
@@ -260,20 +252,31 @@ function mostrarLista(){
         }
         mostrarInicioNovena(id);
     }
-    // Primera pantalla de la novena
-        function mostrarInicioNovena(id){
-            const novena = getNovena(id);
+
+    // ✅ FIX #2: Primera pantalla de la novena — muestra si ya se rezó hoy
+    function mostrarInicioNovena(id){
+        const novena = getNovena(id);
         const dia = calcularDiaNovena(id);
+        const hoy = new Date().toISOString().split("T")[0];
+        const ultimoRezo = localStorage.getItem(`ultimoRezo_${id}`);
+        const rezadoHoy = ultimoRezo === hoy;
+
+        const checkRezo = rezadoHoy
+            ? `<p style="color:#90ee90; margin:10px 0;">✅ Ya has rezado hoy</p>`
+            : `<p style="color:#ffcc00; margin:10px 0;">⏳ Aún no has rezado hoy</p>`;
+
         app.innerHTML = `
             <div class="container">
                 <h2>Día ${dia}</h2>
                 <h1>${novena.nombre}</h1>
+                ${checkRezo}
                 <button onclick="iniciarFlujoNovena('${id}')">Continuar</button>
                 <button onclick="cambiarDiaManual('${id}')">Cambiar día</button>
                 <button onclick="mostrarInicio()">Inicio</button>
             </div>
             `;
-        }
+    }
+
     //Iniciar flujo de la novena (día → coronilla → letanías)
         function iniciarFlujoNovena(id){
         const dia = calcularDiaNovena(id);
@@ -348,20 +351,20 @@ function mostrarLista(){
                     return;
                 }
             const { id, dia } = secuenciaActual;
-            registrarRezoCompletado(id);
+            await registrarRezoCompletado(id);
             if (dia === 1) {
                 const quiereRecordatorio = confirm("¡Has terminado el primer día! ¿Te gustaría programar un recordatorio?");
                 if (quiereRecordatorio) {
-                programarRecordatorio(id, true);
-                return;
+                    programarRecordatorio(id, true);
+                    return;
                 }
             }      
             if(dia === getTotalDiasNovena(id)){
-            await eliminarRecordatorio(id);
-            mostrarFelicitacion(id, dia);
-            return;
+                await eliminarRecordatorio(id);
+                mostrarFelicitacion(id, dia);
+                return;
             }
-        alert(`Has terminado el día ${dia}. ¡Ánimo!`);
+            alert(`Has terminado el día ${dia}. ¡Ánimo!`);
             secuenciaActual = null;
             mostrarInicio();
         }
@@ -374,7 +377,7 @@ function mostrarLista(){
             }
             else if(paso === "coronilla"){
             if(data && data.coronilla) {
-                iniciarCoronillaSecuencia(id); // 👈 cambio clave
+                iniciarCoronillaSecuencia(id);
             } else {
                 secuenciaActual.paso = "letania";
                 mostrarPaso();
@@ -388,6 +391,7 @@ function mostrarLista(){
             }
             }
         }
+
     // Saber día de la novena
         function getTotalDiasNovena(id){
             const data = contenidoNovenas[id];
@@ -418,7 +422,7 @@ function mostrarLista(){
         // Mostrar día de la novena
             function mostrarDiaNovena(id){
                 const data = contenidoNovenas[id];
-            // 👇 Seguridad: si no hay secuencia, la creamos
+            // Seguridad: si no hay secuencia, la creamos
                 if(!secuenciaActual){
                 const dia = calcularDiaNovena(id);
                 secuenciaActual = {
@@ -432,7 +436,7 @@ function mostrarLista(){
                 const bloqueIndex = secuenciaActual.bloque;
                 const diaData = data.novena[dia-1];
                 const bloque = diaData.contenido[bloqueIndex];
-            // 👇 Seguridad extra
+            // Seguridad extra
                 if(!bloque){
                     finalizarSecuencia();
                 return;
@@ -456,6 +460,7 @@ function mostrarLista(){
                 </div>
                 `;
             }
+
     // Modo día manual
     function cambiarDiaManual(id){
         let totalDias = getTotalDiasNovena(id);
@@ -481,7 +486,7 @@ function mostrarLista(){
             const inicio = localStorage.getItem("inicioNovena_" + novena.id);
             if(inicio){
                 const dia = calcularDiaNovena(novena.id);
-                if(dia >= 1 && dia <= getTotalDiasNovena(novena.id)){ // novena no completada
+                if(dia >= 1 && dia <= getTotalDiasNovena(novena.id)){
                     enCurso.push({
                         id: novena.id,
                         nombre: novena.nombre,
@@ -510,14 +515,12 @@ function mostrarLista(){
         lista += `<br><button onclick="mostrarInicio()">Volver</button>`;
         app.innerHTML = `<div class="container">${lista}</div>`;
     }
+
 // Pantalla de novena
-    // Uso interno - ve la lista de novenas y devuelve la que coincide con el id
     function getNovena(id) {
         return novenas.find(n => n.id === id);
     }
-    // Crea los botones de la pantalla de novena según las características de cada novena
-       // Crea los botones de la pantalla de novena según las características de cada novena
-       function crearBotonesNovena(id, novena) {
+    function crearBotonesNovena(id, novena) {
          const botonesConfig = [
          ['rezarNovena', 'Rezar novena'],
          ['rezarCoronilla', 'Rezar coronilla'],
@@ -536,8 +539,8 @@ function mostrarLista(){
         window.rezarLetanias = rezarLetanias;
         window.rezarOracion = rezarOracion;
         window.programarRecordatorio = programarRecordatorio;
-    // Renderiza la pantalla de la novena con su imagen de fondo y los botones correspondientes
-        function abrirNovena(id) {
+
+    function abrirNovena(id) {
             const novena = getNovena(id);
             const botones = crearBotonesNovena(id, novena);
         app.innerHTML = `
@@ -550,10 +553,10 @@ function mostrarLista(){
         `;
         setBackground(novena.imagen);
     }
+
 // --------------------
 // REZAR Letanías y Oración
 // --------------------
-// Rezar Letanías
     function rezarLetanias(id){
         const data = contenidoNovenas[id];
         if(!data || !data.letanias){
@@ -564,7 +567,7 @@ function mostrarLista(){
         if(Array.isArray(texto)) texto = texto.join("\n\n");
         texto = texto.trim();
         // Si estamos en flujo, el botón finaliza la secuencia; si no, vuelve a la novena
-            const botonAccion = secuenciaActual
+        const botonAccion = secuenciaActual
             ? `<button onclick="finalizarSecuencia()">Terminar</button>`
             : `<button onclick="abrirNovena('${id}')">Volver</button>`;
         app.innerHTML = `
@@ -575,23 +578,19 @@ function mostrarLista(){
         </div>
         `;
     }
+
 // Rezar Oración
 function rezarOracion(id){
     const data = contenidoNovenas[id];
-
     if(!data || !data.oracion){
         alert("Esta novena no tiene oración");
         return;
     }
-
     let texto = data.oracion;
-
     if(Array.isArray(texto)){
         texto = texto.join("\n\n");
     }
-
     texto = texto.trim();
-
     app.innerHTML = `
     <div class="container">
         <h1>Oración</h1>
@@ -602,6 +601,7 @@ function rezarOracion(id){
     </div>
     `;
 }
+
 // ══════════════════════════════════════════════════
 // SISTEMA DE RECORDATORIOS
 // ══════════════════════════════════════════════════
@@ -611,7 +611,6 @@ if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("service-worker.js")
         .then(reg => {
             console.log("Service Worker registrado");
-            // Escuchamos mensajes del SW (p.ej. para abrir novena desde notificación)
             navigator.serviceWorker.addEventListener("message", event => {
                 if (event.data.tipo === "abrirNovena") {
                     rezarNovena(event.data.idNovena);
@@ -626,7 +625,6 @@ window.addEventListener("load", () => {
     const params = new URLSearchParams(window.location.search);
     const novenaParam = params.get("novena");
     if (novenaParam) {
-        // Limpiamos la URL sin recargar
         history.replaceState({}, "", "index.html");
         rezarNovena(novenaParam);
     }
@@ -642,8 +640,6 @@ async function pedirPermisoNotificaciones() {
 }
 
 // ── Pantalla para programar recordatorio ─────────
-// esSeguimiento = true → viene de terminar el día 1 (solo pide hora)
-// esSeguimiento = false → el usuario lo activa manualmente (pide fecha y hora)
 function programarRecordatorio(id, esSeguimiento = false) {
     const novena = novenas.find(n => n.id === id);
     const titulo = esSeguimiento
@@ -678,7 +674,6 @@ async function guardarNuevoRecordatorio(id, esSeguimiento) {
         return;
     }
 
-    // Construimos la fecha de inicio del recordatorio
     let fechaBase;
     let horaProgramada;
 
@@ -686,7 +681,6 @@ async function guardarNuevoRecordatorio(id, esSeguimiento) {
         const [h, m] = valorInput.split(":");
         fechaBase = new Date();
         fechaBase.setHours(parseInt(h), parseInt(m), 0, 0);
-        // Si la hora elegida ya pasó hoy, empezamos mañana
         if (fechaBase <= new Date()) {
             fechaBase.setDate(fechaBase.getDate() + 1);
         }
@@ -696,14 +690,12 @@ async function guardarNuevoRecordatorio(id, esSeguimiento) {
         horaProgramada = `${String(fechaBase.getHours()).padStart(2, "0")}:${String(fechaBase.getMinutes()).padStart(2, "0")}`;
     }
 
-    // Guardamos en localStorage para referencia interna
     const registro = { id, inicio: fechaBase.getTime(), hora: horaProgramada };
     const todos = JSON.parse(localStorage.getItem("recordatorios")) || [];
     const filtrados = todos.filter(r => r.id !== id);
     filtrados.push(registro);
     localStorage.setItem("recordatorios", JSON.stringify(filtrados));
 
-    // Calculamos los timestamps de los 9 días y los enviamos al Service Worker
     const totalDias = getTotalDiasNovena(id);
     const novena = novenas.find(n => n.id === id);
     const notificaciones = [];
@@ -712,7 +704,6 @@ async function guardarNuevoRecordatorio(id, esSeguimiento) {
         const fechaDia = new Date(fechaBase);
         fechaDia.setDate(fechaBase.getDate() + dia);
 
-        // Notificación principal a la hora elegida
         notificaciones.push({
             idNovena: id,
             nombreNovena: novena.nombre,
@@ -720,7 +711,6 @@ async function guardarNuevoRecordatorio(id, esSeguimiento) {
             esRecordatorio: false
         });
 
-        // Recordatorio de 2h después si no ha rezado
         const fechaRecordatorio = new Date(fechaDia);
         fechaRecordatorio.setHours(fechaRecordatorio.getHours() + 2);
         notificaciones.push({
@@ -731,9 +721,15 @@ async function guardarNuevoRecordatorio(id, esSeguimiento) {
         });
     }
 
-    // Enviamos al Service Worker
+    // ✅ FIX #1: Comprobamos que el SW está activo antes de enviarle mensajes
     const sw = await navigator.serviceWorker.ready;
-    sw.active.postMessage({ tipo: "programar", recordatorios: notificaciones });
+    if (sw.active) {
+        sw.active.postMessage({ tipo: "programar", recordatorios: notificaciones });
+    } else {
+        console.error("Service Worker no está activo todavía");
+        alert("Hubo un problema al guardar el recordatorio. Cierra y vuelve a abrir la app e inténtalo de nuevo.");
+        return;
+    }
 
     alert("¡Recordatorio guardado! Te avisaremos cada día a las " + horaProgramada + ".");
     secuenciaActual = null;
@@ -742,15 +738,16 @@ async function guardarNuevoRecordatorio(id, esSeguimiento) {
 
 // ── Cancelar recordatorio (al terminar la novena) ─
 async function eliminarRecordatorio(id) {
-    // Quitamos de localStorage
     let todos = JSON.parse(localStorage.getItem("recordatorios")) || [];
     todos = todos.filter(r => r.id !== id);
     localStorage.setItem("recordatorios", JSON.stringify(todos));
 
-    // Cancelamos las notificaciones programadas en el SW
+    // ✅ FIX #1: Comprobamos que el SW está activo antes de enviarle mensajes
     if ("serviceWorker" in navigator) {
         const sw = await navigator.serviceWorker.ready;
-        sw.active.postMessage({ tipo: "cancelar", idNovena: id });
+        if (sw.active) {
+            sw.active.postMessage({ tipo: "cancelar", idNovena: id });
+        }
     }
 }
 
@@ -759,17 +756,20 @@ async function registrarRezoCompletado(id) {
     const hoyString = new Date().toISOString().split("T")[0];
     localStorage.setItem(`ultimoRezo_${id}`, hoyString);
 
+    // ✅ FIX #1: Comprobamos que el SW está activo antes de enviarle mensajes
     if ("serviceWorker" in navigator) {
         const sw = await navigator.serviceWorker.ready;
-        sw.active.postMessage({ tipo: "marcarRezado", idNovena: id });
+        if (sw.active) {
+            sw.active.postMessage({ tipo: "marcarRezado", idNovena: id });
+        }
     }
 }
 
-// ── Finalizar novena con mensaje de felicitación ──
-// Reemplaza el finalizarSecuencia() que tenías — añade el mensaje al completar
-// IMPORTANTE: esto solo afecta al fragmento de "día === totalDías",
-// el resto de tu finalizarSecuencia queda igual.
-function mostrarFelicitacion(id, dia) {
+// ✅ FIX #3: Finalizar novena — borra localStorage para que desaparezca de "en curso"
+function mostrarFelicitacion(id) {
+    localStorage.removeItem("inicioNovena_" + id);
+    localStorage.removeItem(`ultimoRezo_${id}`);
+
     const novena = novenas.find(n => n.id === id);
     app.innerHTML = `
     <div class="container">
