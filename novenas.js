@@ -53,7 +53,7 @@ nombre: "Para pedir la castidad",
 imagen: "Castidad.jpg",
 tieneOracion: false,
 tieneLetanias: false,
-oculta: true
+oculta: false
 }
 ];
 
