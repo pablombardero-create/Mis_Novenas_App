@@ -1,0 +1,254 @@
+/* 1. RESET / BASE */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* 2. ROOT / VARIABLES */
+:root {
+  --primary-color: white;
+  --glass-bg: rgba(0,0,0,0.6);
+}
+
+/* 3. BODY */
+body {
+  font-family: Arial, sans-serif;
+  font-size: 17px;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  padding: 20px;
+}
+
+/* 4. OVERLAY OSCURO DE FONDO */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 0;
+}
+
+/* 5. CONTAINER */
+.container {
+  position: relative;
+  z-index: 1;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 36px 28px;
+  border-radius: 14px;
+  text-align: center;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: aparecer 0.4s ease;
+}
+
+/* 5b. CABECERA Y PIE FIJOS, CUERPO CON SCROLL */
+.container.scroll-interno {
+  display: flex;
+  flex-direction: column;
+  overflow-y: hidden;
+}
+
+.container.scroll-interno .cabecera-fija {
+  flex: 0 0 auto;
+}
+
+.container.scroll-interno .cuerpo-scroll {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.container.scroll-interno .pie-fijo {
+  flex: 0 0 auto;
+  margin-top: 12px;
+}
+
+/* 6. TIPOGRAFÍA */
+h1 {
+  color: white;
+  font-size: 1.8em;
+  margin-bottom: 24px;
+  line-height: 1.2;
+}
+
+h2 {
+  color: white;
+  font-size: 1.3em;
+  margin-bottom: 12px;
+}
+
+p {
+  color: white;
+}
+
+h3 {
+  color: white;
+  font-size: 1.8em;
+  margin-bottom: 12px;
+  font-family: 'Palatino Linotype', Palatino, serif;
+}
+
+/* 7. BOTONES */
+button {
+  display: block;
+  width: 100%;
+  max-width: 300px;
+  margin: 10px auto;
+  padding: 14px 20px;
+  font-size: 18px;
+  border: none;
+  border-radius: 10px;
+  background: white;
+  color: #222;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+button:active {
+  opacity: 0.75;
+}
+
+/* 8. CONTENIDO */
+.oracion {
+  font-family: 'Palatino Linotype', Palatino, serif;
+  color: white;
+  font-size: 1.15em;
+  line-height: 1.7;
+  margin-bottom: 24px;
+  text-align: center;
+  white-space: pre-line;
+}
+
+.contador {
+  color: white;
+  font-size: 1em;
+  margin-bottom: 12px;
+  opacity: 0.85;
+}
+
+.rosario {
+  font-family: 'Palatino Linotype', Palatino, serif;
+  color: white;
+  font-size: 1.15em;
+  line-height: 1.7;
+  margin-bottom: 24px;
+  text-align: center;
+  white-space: pre-line;
+}
+
+.botones {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.botones button {
+  flex: 1 1 120px;
+  max-width: 160px;
+  margin: 0;
+}
+
+.letanias {
+  font-family: 'Palatino Linotype', Palatino, serif;
+  color: white;
+  font-size: 1.15em;
+  line-height: 1.7;
+  margin-bottom: 24px;
+  text-align: justify;
+  white-space: pre-line;  
+  hyphens: auto;
+}
+
+.texto-coronilla {
+  font-family: 'Palatino Linotype', Palatino, serif;
+  color: white;
+  font-size: 1.15em;
+  line-height: 1.7;
+  margin-bottom: 24px;
+  text-align: center;
+  white-space: pre-line;
+}
+
+.texto-justificado {
+  font-family: 'Palatino Linotype', Palatino, serif;
+  color: white;
+  font-size: 1.15em;
+  line-height: 1.7;
+  margin-bottom: 24px;
+  text-align: justify;
+  white-space: pre-line;
+  white-space: pre-line;
+  padding: 0 8px;
+}
+
+.aviso-salir {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.85);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 0.9em;
+  z-index: 999;
+  animation: aparecer 0.3s ease;
+}
+
+.boton-contacto {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  font-size: 1.3em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+  z-index: 500;
+  max-width: none;
+}
+
+/* 9. ANIMACIONES */
+@keyframes aparecer {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* 10. AJUSTES DE TAMAÑO — SOLO VERSIÓN APP NATIVA (ANDROID) */
+body.app-nativa {
+  font-size: 15px;
+}
+
+body.app-nativa h1 {
+  font-size: 1.6em;
+}
+
+body.app-nativa h2 {
+  font-size: 1.15em;
+}
+
+body.app-nativa button {
+  font-size: 16px;
+}
+
+body.app-nativa .oracion,
+body.app-nativa .rosario,
+body.app-nativa .letanias,
+body.app-nativa .texto-coronilla,
+body.app-nativa .texto-justificado {
+  font-size: 1.05em;
+}

@@ -1,9 +1,9 @@
-const SW_VERSION = "1.1.0";
+const SW_VERSION = "1.2.4";
 const CACHE_NAME = "novenas-cache-" + SW_VERSION; // ✅ cambia con cada versión
 const ARCHIVOS = [
     "./index.html",
-    "./App.js",
-    "./Novenas.js",
+    "./app.js",
+    "./novenas.js",
     "./style.css",
     "./manifest.json",
     "./icono-192.png",
@@ -14,7 +14,9 @@ const ARCHIVOS = [
     "./Jesus_Divina_Misericordia.jpg",
     "./EspirituSanto.jpg",
     "./AngelCustodio.jpg",
-    "./Castidad.jpg"
+    "./Castidad.jpg",
+    "./PadrePio.jpg",
+    "./SantaTeresa.jpg"
 ];
 
 // ─────────────────────────────────────────

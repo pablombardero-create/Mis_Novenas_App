@@ -4,61 +4,170 @@ const novenas = [
 id: "abandono",
 nombre: "Del Abandono",
 imagen: "Dolindo.jpg",
+fechaOficial: null,
 tieneOracion: true,
-tieneLetanias: false
+tieneLetanias: false,
+tieneCoronilla: true,
+oculta: false
 },
 {
 id: "sagrado_corazon",
 nombre: "Al Sagrado Corazón de Jesús",
 imagen: "SagradoCorazon.jpg",
+fechaOficial: { tipo: "movible", offsetDesdePascua: 59 },
 tieneLetanias: true,
 tieneOracion: true,
+tieneCoronilla: true,
 oculta: false
 },
 {
 id: "divina_misericordia",
 nombre: "A la Divina Misericordia",
 imagen: "Jesus_Divina_Misericordia.jpg",
+fechaOficial: { tipo: "movible", offsetDesdePascua: -2 },
 tieneLetanias: true,
 tieneOracion: false,
+tieneCoronilla: true,
 oculta: false
 },
 {
 id: "espiritu_santo",
 nombre: "Al Espíritu Santo",
 imagen: "EspirituSanto.jpg",
+fechaOficial: { tipo: "movible", offsetDesdePascua: 42 },
 tieneLetanias: true,
 tieneOracion: true,
+tieneCoronilla: true,
 oculta: false
 },
 {
 id: "angel_custodio",
 nombre: "Al Ángel Custodio",
 imagen: "AngelCustodio.jpg",
+fechaOficial: { tipo: "fija", mes: 10, dia: 2 },
 tieneLetanias: false,
 tieneOracion: true,
+tieneCoronilla: true,
 oculta: false
 },
 {
-id: "Perdon",
+id: "perdon",
 nombre: "Para pedir perdón por los pecados",
 imagen: "Perdon.jpg",
+fechaOficial: null,
 tieneOracion: true,
 tieneLetanias: true,
+tieneCoronilla: true,
 oculta: true
 },
 {
 id: "castidad",
 nombre: "Para pedir la castidad",
 imagen: "Castidad.jpg",
+fechaOficial: null,
 tieneOracion: false,
 tieneLetanias: false,
+tieneCoronilla: true,
+oculta: false
+},
+{
+id: "padre_pio",
+nombre: "del Padre Pío",
+imagen: "PadrePio.jpg",
+fechaOficial: { tipo: "fija", mes: 9, dia: 23 },
+tieneOracion: true,
+tieneLetanias: false,
+tieneCoronilla: false,
+oculta: false
+},
+{
+id: "santa_teresa",
+nombre: "de Santa Teresa de Jesús",
+imagen: "SantaTeresa.jpg",
+fechaOficial: { tipo: "fija", mes: 10, dia: 15 },
+tieneOracion: false,
+tieneLetanias: false,
+tieneCoronilla: false,
 oculta: false
 }
 ];
 
   //Ordena alfabéticamente
   novenas.sort((a,b)=>a.nombre.localeCompare(b.nombre));
+
+//-------------
+// Funciones
+//-------------
+// Inicio Bloque día oficial de comienzo de novena
+function calcularPascua(año){
+    // Algoritmo del cómputo eclesiástico (calendario gregoriano)
+    const a = año % 19;
+    const b = Math.floor(año / 100);
+    const c = año % 100;
+    const d = Math.floor(b / 4);
+    const e = b % 4;
+    const f = Math.floor((b + 8) / 25);
+    const g = Math.floor((b - f + 1) / 3);
+    const h = (19 * a + b - d - g + 15) % 30;
+    const i = Math.floor(c / 4);
+    const k = c % 4;
+    const l = (32 + 2 * e + 2 * i - h - k) % 7;
+    const m = Math.floor((a + 11 * h + 22 * l) / 451);
+    const mes = Math.floor((h + l - 7 * m + 114) / 31);
+    const dia = ((h + l - 7 * m + 114) % 31) + 1;
+    return new Date(año, mes - 1, dia);
+}
+
+function obtenerFechaOficialParaAño(fechaOficial, año){
+    if(fechaOficial.tipo === "fija"){
+        const fiesta = new Date(año, fechaOficial.mes - 1, fechaOficial.dia);
+        const inicio = new Date(fiesta);
+        inicio.setDate(inicio.getDate() - 9);
+        return inicio;
+    }
+    if(fechaOficial.tipo === "movible"){
+        const pascua = calcularPascua(año);
+        const inicio = new Date(pascua);
+        inicio.setDate(inicio.getDate() + fechaOficial.offsetDesdePascua);
+        return inicio;
+    }
+    return null;
+}
+
+function calcularFechaOficialInicio(fechaOficial){
+    if(!fechaOficial) return null;
+    const hoy = new Date();
+    hoy.setHours(0,0,0,0);
+    let año = hoy.getFullYear();
+    let fecha = obtenerFechaOficialParaAño(fechaOficial, año);
+    if(fecha < hoy){
+        año++;
+        fecha = obtenerFechaOficialParaAño(fechaOficial, año);
+    }
+    return fecha;
+}
+// Fin Bloque día oficial de comienzo de novena
+
+function crearDiasNovena(lectura, meditacion = null, oracionInicial = null, oracionFinal = null, titulos = null){
+    return lectura.map((texto, index) => {
+        const contenido = [];
+        if (oracionInicial) {
+            contenido.push({ tipo: "oracion", texto: oracionInicial });
+        }
+        const bloqueLectura = { tipo: "texto", texto: texto };
+        if (titulos) {
+            bloqueLectura.titulo = titulos[index];
+        }
+        contenido.push(bloqueLectura);
+        if (meditacion) {
+            contenido.push({ tipo: "texto", texto: meditacion[index] });
+        }
+        if (oracionFinal) {
+            contenido.push({ tipo: "oracion", texto: oracionFinal });
+        }
+        return { dia: index + 1, contenido };
+    });
+}
 
 //-------------
 // Constantes
@@ -93,10 +202,10 @@ oculta: false
   Creador, Padre, Redentor mío:
   por ser vos quien sois, bondad infinita,
   y porque os amo sobre todas las cosas,
-  me pesa de todo corazón haberos ofendido
+  me pesa de todo corazón haberos ofendido,
   también me pesa porque podéis castigarme con las penas del infierno;
-  por eso, ayudado de vuestra Divina Gracia
-  propongo firmemente nunca más pecar
+  por eso, ayudado de vuestra Divina Gracia,
+  propongo firmemente nunca más pecar,
   confesarme y cumplir la penitencia que me fuere impuesta.
   Amén.`;
   // Oraciones específicas de la novena del abandono
@@ -160,7 +269,7 @@ oculta: false
     const AguaySangre = "¡Oh Agua y Sangre que brotaste del Sagrado Corazón de Jesús como una fuente de misericordia para nosotros, en Ti confío!";
   // Oraciones específicas de la novena al Espíritu Santo
     const VenPorMaria = `"Ven Espíritu Santo, ven por María"`;
-    const QueHare = `Espíritu Santo, vida mía ¿Qué haré yo sin ti?`;
+    const QueHare = `Espíritu Santo, vida mía, ¿Qué haré yo sin ti?`;
     const VeniCreator = `Ven Espíritu Creador
     visita nuestra mente
     llena de tu amor
@@ -182,7 +291,7 @@ oculta: false
     tu guía invencible
     nos preserve del mal.
     ¡Oh luz de eterna Sabiduría!
-    Desvelanos del gran Misterio
+    Desvélanos del gran Misterio
     de Dios Padre y del Hijo
     Unidos en un solo amor.
     Amén.`
@@ -227,7 +336,7 @@ oculta: false
         const Misterio2AngelCustodio = `N. no me dejes, que sin ti no puedo`
         const Misterio3AngelCustodio = `N. vigílame, que sin ti huyo`
         const Misterio4AngelCustodio = `N. protégeme, pues el Padre me encomendó a tu cuidado`
-        const Misterio5AngelCustodio = `N. cuidame para que podamos algún día reconocernos con alegría en el Reino de los Cielos`
+        const Misterio5AngelCustodio = `N. cuídame para que podamos algún día reconocernos con alegría en el Reino de los Cielos`
         // Oraciones
         const OracionBerchmansAngelCustodio = `Ángel Santo, amado de Dios, que después de haberme tomado, por disposición divina, bajo vuestra bienaventurada guarda, jamás cesáis de defenderme, de iluminarme y de dirigirme: yo os venero como a protector, os amo como a custodio; me someto a vuestra dirección y me entrego todo a Vos, para ser de Vos gobernado. Os ruego, por lo tanto, y por amor de Jesucristo os suplico, que, cuando sea ingrato para con Vos y obstinadamente sordo a vuestras inspiraciones, no queráis, a pesar de esto, abandonarme; antes al contrario, ponedme pronto en el recto camino, si me he desviado de él; enseñadme, si soy ignorante; levantadme, si he caído; sostenedme, si estoy en peligro, y conducidme al cielo para poseer en él una felicidad eterna. Amén`
         const OracionFinalCoronillaAngelCustodio = `Ángel de Dios, que eres mi custodio, pues la bondad divina me ha encomendado a ti, ilumíname, dirígeme, guárdame. Amén`
@@ -262,7 +371,7 @@ oculta: false
     // Oraciones específicas de la novena para pedir perdón
         //Coronilla
             const OraciondelCorazon1 = `Señor Jesús, Hijo de Dios vivo, ten piedad de mí, que soy un pecador`
-            const OraciondelCorazon2 = `Señor Jesus, hijo de David, ten piedad de mí, que soy un pecador`
+            const OraciondelCorazon2 = `Señor Jesús, hijo de David, ten piedad de mí, que soy un pecador`
         //Oraciones
             const Salmo50 = `Misericordia, Dios mío, por tu bondad, 
                 por tu inmensa compasión borra mi culpa; 
@@ -309,6 +418,48 @@ oculta: false
                 sobre tu altar se inmolarán novillos.`
         //Letanias
             const LetaniasPenitenciales = `En proceso`
+    // Oraciones específicas de la novena del Padre Pío
+        //Oraciones
+            const OracionFinNovenaPadrePio = `Has venido a visitarme como Padre y como amigo. 
+                Jesús no me dejes solo. 
+                Señor, ¡quédate conmigo!
+                Soy un peregrino, sin rumbo en un mundo envuelto en tinieblas. 
+                Dame tu luz y tu gracia. 
+                Señor, ¡quédate conmigo!
+                Señor, en este momento precioso, me abrazo a ti.
+                Que esta unión dure para siempre. 
+                Señor, ¡quédate conmigo!
+                Acompáñame a lo largo de mi vida; necesito tu presencia. 
+                Sin ti no soy nada y caigo. 
+                Señor, ¡quédate conmigo!
+                Llega la noche y voy corriendo, como un río, 
+                hacia el mar profundo de la muerte. 
+                Señor, ¡quédate conmigo!
+                Sé mi fuerza en el sufrimiento y en el gozo, 
+                mientras vivo y en la hora en que moriré en tus brazos. 
+                Señor, ¡quédate conmigo!`
+            const OracionInicioNovenaPadrePio = `Padre de bondad y misericordia, 
+                fuente inagotable de vida y felicidad, 
+                te pido, por intercesión de san Pío de Pietrelcina, 
+                me concedas ser semejante a él: 
+                sencillo y humilde, 
+                libre y alegre, 
+                pobre y laborioso.
+
+                Porque confío en tu amor y en tu gracia, 
+                hoy te ofrezco libremente cuanto soy y cuanto tengo, 
+                deposito mi pasado en tu misericordia, 
+                encomiendo mi futuro a tu providencia 
+                y me quedo tranquilo tratando de vivir un día a la vez.
+
+                Te entrego mi memoria, mi inteligencia y mi voluntad. 
+                Te consagro mis fuerzas y mis límites, 
+                tómame como soy y haz de mí, como hiciste del padre Pío, 
+                un buen cristiano y un honrado ciudadano 
+                que te alabe sirviendo a mis hermanos. Amén.`
+            const OracionPadrePio = `Jesús, dame tu fuerza cuando, frente a las pruebas del futuro, mi naturaleza, llevada de su debilidad, tienda a rebelarse; para que pueda afrontar como tú, con una paz sosegada y serena, cuantos dolores y tormentos tenga que sobrellevar en esta tierra de exilio. Me uno plenamente a tus méritos, a tus sufrimientos, a tu expiación, a tus lágrimas, para cooperar contigo a mi salvación y evitar el pecado, la única causa de tu sudor de sangre y de tu condena a muerte. 
+                Destruye todo lo que te desagrada de mí y, con el fuego sagrado de tu caridad, imprime tus dolores en mi corazón; átame tanto a ti, con lazos tan estrechos y tan dulces, que nunca más te abandone en tu dolor; que en medio de las pruebas de esta vida me refugie en tu Corazón para obtener de él fuerza y consuelo; y que mi corazón no ambicione jamás otra cosa que permanecer junto a ti en el Huerto de la agonía para saciarse del dolor de tu Corazón. Que mi alma se embriague con tu Sangre y se alimente contigo del pan de tus sufrimientos. 
+                Así sea.`        
 //-------------------------------
 //Novenas
 //-------------------------------
@@ -343,99 +494,20 @@ const coronillaAbandono = [
     A través de ti y contigo quiero pertenecer completamente a Jesús 
     para siempre."`
 ];
-const novenaAbandono = [
-    {
-    dia: 1,
-    contenido: [
-        {
-            tipo: "texto",
-            texto: `Día 1
-            ¿Por qué confundís vuestras mentes preocupándoos? Dejad que yo me ocupe de vuestros asuntos y todo estará tranquilo. Os digo de verdad que todo acto de verdadero, ciego y completo abandono a Mí, produce el efecto que deseáis y resuelve todas las situaciones difíciles.`,
-        }
-    ]
-  },    
-  {
-    dia: 2,
-    contenido: [
-        {
-            tipo: "texto",
-            texto: `Día 2
-            Abandonarse a mí no significa agitarse, turbarse o perder la esperanza, ni significa ofrecerme una oración preocupada, pidiéndome que te siga y que transforme tu preocupación en oración. Preocuparse, estar agitado y querer pensar en las posibles consecuencias de todo es profundamente contrario a este acto de confianza. Una actitud así recuerda a la confusión que experimentan los niños cuando piden a su madre que les ayude en cualquier cosa, pero después intentan ocuparse ellos completamente solos, de modo que después la madre no consigue ayudarles como se debe. Abandonarse a mí significa cerrar los ojos del propio alma con serenidad, apartar los pensamientos ansiosos y dejarse en mis manos, en mi cuidado, de modo que tu obrar consista esencialmente en decir 
-“ocúpate Tú”.`
-        },
-    ]
-   },
-  {
-    dia: 3,
-    contenido: [
-        {
-            tipo: "texto",
-            texto: `Día 3
-            Consigo hacer tantas cosas cuando un alma, en necesidad espiritual y material me mira y me  dice “Ocúpate Tú” … después cierra los ojos y descansa. En el dolor, pedís que Yo actúe, pero que actúe según vuestro querer. Y haciendo así no os volvéis a Mí, sino que queréis que Yo me acomode a vuestras ideas. No sois enfermos que preguntan al médico qué hacer. No hagáis así sino rezad como os he enseñado en el Padre Nuestro “Sea santificado tu nombre” que para ti significa decir “Que Tú seas santificado en mi querer”. “Venga tu Reino” que significa que todo aquello que está en nosotros y en el mundo esté de acuerdo con tu voluntad, con tu reino. “Hágase tu voluntad así en la tierra como en el cielo”, que significa decir “Dios, en mi necesidad, haz lo que piensas que sea mejor para nosotros, sea para nuestra vida temporal o para la eterna”. Si me decís con sinceridad “Hágase tu voluntad”,esto equivale a decir “Encárgate tú”, Yo intervendré con toda mi omnipotencia y resolveré las situaciones más difíciles.`
-        },
-    ]
-  },
-  {
-    dia: 4,
-    contenido: [
-        {
-            tipo: "texto",
-            texto: `Día 4
-            ¿Veis que el mal crece en vez de debilitarse? No os preocupéis. Cierra los ojos y dime con fe:  “Hágase tu voluntad, ocúpate Tú”. Os digo que me ocuparé Yo, que intervendré como hace un médico y cumpliré cualquier milagro cuando haga falta. ¿Veis que el enfermo está empeorando? No os cabreéis, cerrad los ojos y decid “Ocúpate Tú”. Os digo que me ocuparé Yo y que no hay medicina más potente que mi intervención amorosa. Con mi amor, te prometo esto.`
-        },
-        ]
-  },
-  {
-    dia: 5,
-    contenido: [
-        {
-            tipo: "texto",
-            texto: `Día 5
-            Y después os tendré que conducir por un camino distinto de aquel que veis, os prepararé, os llevaré en brazos. Lo haré de tal modo que os veréis a vosotros mismos como los niños que son adormecidos en los brazos de su madre, os encontraréis en la otra orilla del río. Aquello que os turba y que os hace sufrir tantísimo no es otra cosa que vuestra razón, vuestros pensamientos y vuestras preocupaciones, vuestro deseo de querer ocuparos a toda costa de aquello que os aflige.`
-        }
-    ]
-  },
-  {
-    dia: 6,
-    contenido: [
-        {
-            tipo: "texto",
-            texto: `Día 6
-            No podéis dormir; queréis juzgarlo todo y verlo todo, y después os confiáis a las fuerzas humanas -o peor, a los hombres mismos, confiando en su ayuda-, esto es lo que obstaculiza mis palabras y mi voluntad. Oh, ¡Cuánto deseo de vosotros este acto de confianza, así podría ayudaros; y cuanto sufro cuando os veo tan agitados! Satanás quiere hacer exactamente eso: agitaros, alejaros de mi protección y arrojaros en las fauces de la iniciativa humana. Entonces, confía solo en Mí, descansa en Mí, abandónate en Mí en todo.`
-        }
-    ]
-  },
-  {
-    dia: 7,
-    contenido: [
-        {
-            tipo: "texto",
-            texto: `Día 7
-            Yo realizo milagros en proporción a cuanto os abandonáis a Mí y no pensáis en vosotros mismos. Siembro tesoros de gracia cuando estáis en la pobreza más profunda. Ninguna persona sensata, ningún pensador, ha hecho jamás milagros, ni siquiera si son santos. Es quien se confía completamente a Dios quien realiza las obras divinas. Entonces, no te preocupes tú, porque tu mente es aguda y para ti es muy difícil ver el mal y después confiar en Mí y no pensar en ti mismo. Haced esto para todas vuestras necesidades, haced esto, todos vosotros, y veréis constantemente grandes milagros silenciosos. Me ocuparé de todo, te lo prometo.`
-        }
-    ]
-  },
-  {
-    dia: 8,
-    contenido: [
-        {
-            tipo: "texto",
-            texto: `Día 8
-            Cerrad los ojos y dejaros llevar por la corriente de mi Gracia; cerrad los ojos y no penséis en el presente, alejad vuestro pensamiento del futuro como si lo estuvieseis apartando de la tentación. Descansad en Mí, creyendo en mi bondad, y os prometo con mi amor que si decís “Ocúpate tú”, me encargaré yo de todo; os consolaré, os libraré y os guiaré.`
-        }
-    ]
-  },
-  {
-    dia: 9,
-    contenido: [
-        {
-            tipo: "texto",
-            texto: `Día 9
-            Rezad para que estéis siempre preparados a confiar y recibiréis gran paz y grandes recompensas, incluso cuando os conceda la gracia de la inmolación, del arrepentimiento y del amor. ¿Qué importancia tiene ahora el sufrimiento? ¿Tu situación te parece imposible? Cerrad los ojos y decid con toda vuestra alma: “Jesús, ocúpate tú”. No tengáis miedo, cuidaré todos vuestros asuntos y vosotros bendeciréis mi nombre haciendo un acto de humildad. Miles de oraciones no valen lo que un solo acto de abandono bien hecho, recordad bien esto. No hay ninguna novena que sea más eficaz que esta.`
-        }
-    ]
-  }
-];
+
+// Mapa de la novena del Abandono
+    const lecturaDiasAbandono = [
+        "¿Por qué confundís vuestras mentes preocupándoos? Dejad que yo me ocupe de vuestros asuntos y todo estará tranquilo. Os digo de verdad que todo acto de verdadero, ciego y completo abandono a Mí, produce el efecto que deseáis y resuelve todas las situaciones difíciles",
+        "Abandonarse a mí no significa agitarse, turbarse o perder la esperanza, ni significa ofrecerme una oración preocupada, pidiéndome que te siga y que transforme tu preocupación en oración. Preocuparse, estar agitado y querer pensar en las posibles consecuencias de todo es profundamente contrario a este acto de confianza. Una actitud así recuerda a la confusión que experimentan los niños cuando piden a su madre que les ayude en cualquier cosa, pero después intentan ocuparse ellos completamente solos, de modo que después la madre no consigue ayudarles como se debe. Abandonarse a mí significa cerrar los ojos del propio alma con serenidad, apartar los pensamientos ansiosos y dejarse en mis manos, en mi cuidado, de modo que tu obrar consista esencialmente en decir «ocúpate Tú»",
+        "Consigo hacer tantas cosas cuando un alma, en necesidad espiritual y material me mira y me  dice “Ocúpate Tú” … después cierra los ojos y descansa. En el dolor, pedís que Yo actúe, pero que actúe según vuestro querer. Y haciendo así no os volvéis a Mí, sino que queréis que Yo me acomode a vuestras ideas. No sois enfermos que preguntan al médico qué hacer. No hagáis así sino rezad como os he enseñado en el Padre Nuestro “Sea santificado tu nombre” que para ti significa decir “Que Tú seas santificado en mi querer”. “Venga tu Reino” que significa que todo aquello que está en nosotros y en el mundo esté de acuerdo con tu voluntad, con tu reino. “Hágase tu voluntad así en la tierra como en el cielo”, que significa decir “Dios, en mi necesidad, haz lo que piensas que sea mejor para nosotros, sea para nuestra vida temporal o para la eterna”. Si me decís con sinceridad “Hágase tu voluntad”, esto equivale a decir “Encárgate tú”, Yo intervendré con toda mi omnipotencia y resolveré las situaciones más difíciles",
+        "¿Veis que el mal crece en vez de debilitarse? No os preocupéis. Cierra los ojos y dime con fe:  “Hágase tu voluntad, ocúpate Tú”. Os digo que me ocuparé Yo, que intervendré como hace un médico y cumpliré cualquier milagro cuando haga falta. ¿Veis que el enfermo está empeorando? No os cabreéis, cerrad los ojos y decid “Ocúpate Tú”. Os digo que me ocuparé Yo y que no hay medicina más potente que mi intervención amorosa. Con mi amor, te prometo esto",
+        "Y después os tendré que conducir por un camino distinto de aquel que veis, os prepararé, os llevaré en brazos. Lo haré de tal modo que os veréis a vosotros mismos como los niños que son adormecidos en los brazos de su madre, os encontraréis en la otra orilla del río. Aquello que os turba y que os hace sufrir tantísimo no es otra cosa que vuestra razón, vuestros pensamientos y vuestras preocupaciones, vuestro deseo de querer ocuparos a toda costa de aquello que os aflige",
+        "No podéis dormir; queréis juzgarlo todo y verlo todo, y después os confiáis a las fuerzas humanas -o peor, a los hombres mismos, confiando en su ayuda-, esto es lo que obstaculiza mis palabras y mi voluntad. Oh, ¡Cuánto deseo de vosotros este acto de confianza, así podría ayudaros; y cuánto sufro cuando os veo tan agitados! Satanás quiere hacer exactamente eso: agitaros, alejaros de mi protección y arrojaros en las fauces de la iniciativa humana. Entonces, confía solo en Mí, descansa en Mí, abandónate en Mí en todo",
+        "Yo realizo milagros en proporción a cuanto os abandonáis a Mí y no pensáis en vosotros mismos. Siembro tesoros de gracia cuando estáis en la pobreza más profunda. Ninguna persona sensata, ningún pensador, ha hecho jamás milagros, ni siquiera si son santos. Es quien se confía completamente a Dios quien realiza las obras divinas. Entonces, no te preocupes tú, porque tu mente es aguda y para ti es muy difícil ver el mal y después confiar en Mí y no pensar en ti mismo. Haced esto para todas vuestras necesidades, haced esto, todos vosotros, y veréis constantemente grandes milagros silenciosos. Me ocuparé de todo, te lo prometo",
+        "Cerrad los ojos y dejaos llevar por la corriente de mi Gracia; cerrad los ojos y no penséis en el presente, alejad vuestro pensamiento del futuro como si lo estuvieseis apartando de la tentación. Descansad en Mí, creyendo en mi bondad, y os prometo con mi amor que si decís “Ocúpate tú”, me encargaré yo de todo; os consolaré, os libraré y os guiaré",
+        "Rezad para que estéis siempre preparados a confiar y recibiréis gran paz y grandes recompensas, incluso cuando os conceda la gracia de la inmolación, del arrepentimiento y del amor. ¿Qué importancia tiene ahora el sufrimiento? ¿Tu situación te parece imposible? Cerrad los ojos y decid con toda vuestra alma: “Jesús, ocúpate tú”. No tengáis miedo, cuidaré todos vuestros asuntos y vosotros bendeciréis mi nombre haciendo un acto de humildad. Miles de oraciones no valen lo que un solo acto de abandono bien hecho, recordad bien esto. No hay ninguna novena que sea más eficaz que esta"
+    ];
+    const novenaAbandono = crearDiasNovena(lecturaDiasAbandono);
 
 const oracionAbandono = `
 Jesús a las almas: ¿Por qué os confundís agitándoos? Dejadme a mí el cuidado de vuestras cosas y todo
@@ -450,7 +522,7 @@ apremio y el querer a toda costa proveer vosotros a eso que os aflige. ¡Cuánta
 alma, tanto en sus necesidades espirituales como en las necesidades materiales, se dirige a mí, me mira, 
 y diciéndome: «Ocúpate tú», ¡cierra los ojos y descansa! 
 Tenéis pocas gracias cuando os agobiáis para producirlas, tenéis muchísimas cuando la oración es 
-abandono total en mí. Vosotros en el sufrimiento rezais para que yo actúe, pero para que yo actúe como 
+abandono total en mí. Vosotros en el sufrimiento rezáis para que yo actúe, pero para que yo actúe como 
 vosotros creéis... No os dirigís a mí, sino que queréis que yo me adapte a vuestras ideas; no sois enfermos 
 que piden al médico la curación, sino, que se la sugieren. No hagáis así, sino rezad como os he enseñado 
 en el Pater: «Sea santificado tu nombre», es decir seas glorificado en esta necesidad mía; «Venga tu Reino», 
@@ -492,6 +564,7 @@ más eficaz que ésta: «¡Oh Jesús me abandono en ti, ocúpate Tú!»
 const oracionSagradoCorazon = [
   oracioninicionovenaSagradoCorazon,
   oracionPadreEternonovenaSagradoCorazon,
+  oracionletaníasSagradoCorazon,
   oracionFinalnovenaSagradoCorazon
 ];
 
@@ -521,12 +594,12 @@ Corazón de Jesús, abismo de todas las virtudes,
 Corazón de Jesús, digno de toda alabanza, 
 Corazón de Jesús, Rey y centro de todos los corazones, 
 Corazón de Jesús, en quien se hallan todos los tesoros de la sabiduría, y de la ciencia, 
-Corazón de Jesús, en quien reside toda la plenitud de la  divinidad, 
+Corazón de Jesús, en quien reside toda la plenitud de la divinidad, 
 Corazón de Jesús, en quien el Padre se complace, 
 Corazón de Jesús, de cuya plenitud todos hemos recibido, 
 Corazón de Jesús, deseado de los eternos collados, 
 Corazón de Jesús, paciente y lleno de misericordia, 
-Corazón de Jesús, generosos para todos los que te invocan, 
+Corazón de Jesús, generoso para todos los que te invocan, 
 Corazón de Jesús, fuente de vida y santidad, 
 Corazón de Jesús, propiciación por nuestros pecados, 
 Corazón de Jesús, triturado por nuestros pecados, 
@@ -540,7 +613,7 @@ Corazón de Jesús, salvación de los que en ti esperan,
 Corazón de Jesús, esperanza de los que en ti mueren, 
 Corazón de Jesús, delicia de todos los santos, 
 
-Cordero de Dios,  que quitas el pecado del mundo -Perdónanos, Señor
+Cordero de Dios, que quitas el pecado del mundo -Perdónanos, Señor
 Cordero de Dios, que quitas el pecado del mundo -Escúchanos, Señor
 Cordero de Dios, que quitas el pecado del mundo -Ten piedad de nosotros
 
@@ -576,152 +649,30 @@ const coronillaSagradoCorazon = [
     GLORIA
 ];
 
-const novenaSagradoCorazon = [
-{
-    dia: 1,
-    contenido: [
-        {
-            tipo: "oracion",
-            texto: oracioninicionovenaSagradoCorazon
-        },
-        {
-            tipo: "texto",
-            texto: `Día 1
-            ¡Oh Corazón sacratísimo, dulcísimo y manso de Jesús, que, con ferventísimos deseos y ardentísimo amor, deseas corregir y desterrar la sequedad y tibieza, de nuestros corazones! Inflama y consume las maldades e imperfecciones del mío, para que se abrase en tu amor.
+// Mapa de la novena al Sagrado Corazón
+    const lecturaDiasSagradoCorazon = [
+        `¡Oh Corazón sacratísimo, dulcísimo y manso de Jesús, que, con ferventísimos deseos y ardentísimo amor, deseas corregir y desterrar la sequedad y tibieza, de nuestros corazones! Inflama y consume las maldades e imperfecciones del mío, para que se abrase en tu amor.
+        Dame la gracia de resarcir las injurias e ingratitudes hechas contra Ti, oh amantísimo Corazón, y la que te pido ahora, si es para mayor gloria de Dios, adoración y devoción tuya, y bien de mi alma. Amén.`,
+        `¡Oh Corazón sacratísimo, dulcísimo y manso de Jesús, que, con ferventísimos deseos y ardentísimo amor, deseas corregir y desterrar la sequedad y tibieza, de nuestros corazones! Inflama y consume las maldades e imperfecciones del mío, para que se abrase en tu amor.
+        Dame la gracia de resarcir las injurias e ingratitudes hechas contra Ti, oh amantísimo Corazón, y la que te pido ahora, si es para mayor gloria de Dios, adoración y devoción tuya, y bien de mi alma. Amén`,
+        `Oh Corazón Santísimo de Jesús, camino para la mansión eterna y fuente de aguas vivas. Concédeme que siga tus sendas rectísimas para la perfección y para el cielo, y que beba de Ti el agua dulce y saludable de la verdadera virtud y devoción, que apaga la sed de todas las cosas temporales.
+        Dame la gracia de resarcir las injurias e ingratitudes hechas contra Ti, oh amantísimo Corazón, y la que ahora te pido, si es para mayor gloria de Dios, adoración y devoción tuya, y bien de mi alma. Amén`,
+        `Oh Corazón purísimo de Jesús, espejo cristalino en quien resplandece toda la perfección. Concédeme que yo pueda contemplarte perfectamente, para que aspire a formar mi corazón a tu semejanza, en la oración, en la acción y en todos mis pensamientos, palabras y obras. Que mire como Tú, que comprenda como Tú, que ame como Tú.
+        Dame la gracia de resarcir las injurias e ingratitudes hechas contra Ti, oh amante Corazón, y la que te pido ahora, si es para mayor gloria de Dios, adoración y devoción tuya, y bien de mi alma. Amén`,
+        `Oh Corazón dulcísimo de Jesús, templo de la Santísima Trinidad venerada, por quien se perfeccionan todas nuestras obras. Yo te ofrezco las mías, aunque tan imperfectas, para que supliendo Tú mi negligencia, puedan aparecer muy perfectas y agradables ante el divino acatamiento.
+        Dame la gracia de resarcir las injurias e ingratitudes hechas contra Ti, oh amante Corazón, y la que te pido ahora, si es para mayor gloria de Dios, adoración y devoción tuya, y bien de mi alma. Amén`,
+        `Oh Corazón amplísimo de Jesús, templo sagrado donde me mandas habite con toda mi alma, potencias y sentidos, gracias te doy por la inexplicable quietud, sosiego y gozo que yo he hallado en este templo hermoso de la paz, donde descansaré gustoso eternamente.
+        Dame la gracia de resarcir las injurias e ingratitudes hechas contra Ti, oh amante Corazón, y la que te pido ahora, si es para mayor gloria de Dios, adoración y devoción tuya, y bien de mi alma. Amén`,
+        `Oh Corazón clementísimo de Jesús, bondadosamente inclinado a ayudarnos siempre, por el cual ofreció el Eterno Padre que oiría siempre nuestras oraciones, diciendo: «Pídeme por el Corazón de mi amantísimo Hijo Jesús; por este Corazón te oiré, y alcanzarás cuanto me pides». Presento sobre Ti a tu Eterno Padre todas mis peticiones, para conseguir el fruto que deseo.
+        Dame la gracia de resarcir las injurias e ingratitudes hechas contra Ti oh amante Corazón, y la que te pido ahora, si es para mayor gloria de Dios, adoración y devoción tuya, y bien de mi alma. Amén`,
+        `Oh Corazón amantísimo de Jesús, trono ígneo y lucidísimo, inflamado en el amor de los hombres, a quienes deseas abrasados mutuamente en Tu amor. Yo deseo vivir siempre respirando llamas de Amor Divino en que me abrase, y con que encienda a todo el mundo, para que te responda amante y obsequioso
+        Dame la gracia de resarcir las injurias e ingratitudes hechas contra Ti, oh amante Corazón, y la que te pido ahora, si es para mayor gloria de Dios, adoración y devoción tuya, y bien de mi alma. Amén`,
+        `Oh Corazón dolorosísimo de Jesús, que para ablandar nuestra dureza y hacer más patente el amor con que padeciste tantos dolores y penas para salvarnos, los quisiste representar en la cruz, corona de espinas y herida de la lanza, con que te manifestaste paciente y amante al mismo tiempo.
+        Dame la gracia de resarcir las injurias e ingratitudes hechas contra Ti, oh amante Corazón, y la que te pido ahora, si es para mayor gloria de Dios, culto tuyo y bien de mi alma. Amén`
+    ];
 
-            Dame la gracia de resarcir las injurias e ingratitudes hechas contra Ti, oh amantísimo Corazón, y la que te pido ahora, si es para mayor gloria de Dios, adoración y devoción tuya, y bien de mi alma. Amén.`,
-        }
-    ]
-  },
-  {
-    dia: 2,
-    contenido: [
-        {
-            tipo: "oracion",
-            texto: oracioninicionovenaSagradoCorazon
-        },
-        {
-            tipo: "texto",
-            texto: `Día 2
-            ¡Oh Corazón sacratísimo, dulcísimo y manso de Jesús, que, con ferventísimos deseos y ardentísimo amor, deseas corregir y desterrar la sequedad y tibieza, de nuestros corazones! Inflama y consume las maldades e imperfecciones del mío, para que se abrase en tu amor.
+const novenaSagradoCorazon = crearDiasNovena(lecturaDiasSagradoCorazon, null, oracioninicionovenaSagradoCorazon);
 
-            Dame la gracia de resarcir las injurias e ingratitudes hechas contra Ti, oh amantísimo Corazón, y la que te pido ahora, si es para mayor gloria de Dios, adoración y devoción tuya, y bien de mi alma. Amén`,
-        }
-    ]
-  },
-  {
-    dia: 3,
-    contenido: [
-        {
-            tipo: "oracion",
-            texto: oracioninicionovenaSagradoCorazon
-        },
-        {
-            tipo: "texto",
-            texto: `Día 3
-            Oh Corazón Santísimo de Jesús, camino para la mansión eterna y fuente de aguas vivas. Concédeme que siga tus sendas rectísimas para la perfección y para el cielo, y que beba de Ti el agua dulce y saludable de la verdadera virtud y devoción, que apaga la sed de todas las cosas temporales.
-
-            Dame la gracia de resarcir las injurias e ingratitudes hechas contra Ti, oh amantísimo Corazón, y la que ahora te pido, si es para mayor gloria de Dios, adoración y devoción tuya, y bien de mi alma. Amén`,
-        }
-    ]
-  },
-  {
-    dia: 4,
-    contenido: [
-        {
-            tipo: "oracion",
-            texto: oracioninicionovenaSagradoCorazon
-        },
-        {
-            tipo: "texto",
-            texto: `Día 4
-            Oh Corazón purísimo de Jesús, espejo cristalino en quien resplandece toda la perfección. Concédeme que yo pueda contemplarte perfectamente, para que aspire a formar mi corazón a tu semejanza, en la oración, en la acción y en todos mis pensamientos, palabras y obras. Que mire como Tú, que comprenda como Tú, que ame como Tú.
-
-            Dame la gracia de resarcir las injurias e ingratitudes hechas contra Ti, oh amante Corazón, y la que te pido ahora, si es para mayor gloria de Dios, adoración y devoción tuya, y bien de mi alma. Amén`,
-        }
-    ]
-  },
-    {
-    dia: 5,
-    contenido: [
-        {
-            tipo: "oracion",
-            texto: oracioninicionovenaSagradoCorazon
-        },
-        {
-            tipo: "texto",
-            texto: `Día 5
-            Oh Corazón dulcísimo de Jesús, templo de la Santísima Trinidad venerada, por quien se perfeccionan todas nuestras obras. Yo te ofrezco las mías, aunque tan imperfectas, para que supliendo Tú mi negligencia, puedan aparecer muy perfectas y agradables ante el divino acatamiento.
-
-            Dame la gracia de resarcir las injurias e ingratitudes hechas contra Ti, oh amante Corazón, y la que te pido ahora, si es para mayor gloria de Dios, adoración y devoción tuya, y bien de mi alma. Amén`,
-        }
-    ]
-  },
-  {
-    dia: 6,
-    contenido: [
-        {
-            tipo: "oracion",
-            texto: oracioninicionovenaSagradoCorazon
-        },
-        {
-            tipo: "texto",
-            texto: `Día 6
-            Oh Corazón amplísimo de Jesús, templo sagrado donde me mandas habite con toda mi alma, potencias y sentidos, gracias te doy por la inexplicable quietud, sosiego y gozo que yo he hallado en este templo hermoso de la paz, donde descansaré gustoso eternamente.
-
-            Dame la gracia de resarcir las injurias e ingratitudes hechas contra Ti, oh amante Corazón, y la que te pido ahora, si es para mayor gloria de Dios, adoración y devoción tuya, y bien de mi alma. Amén`,
-        }
-    ]
-  },
-  {
-    dia: 7,
-    contenido: [
-        {
-            tipo: "oracion",
-            texto: oracioninicionovenaSagradoCorazon
-        },
-        {
-            tipo: "texto",
-            texto: `Día 7
-            Oh Corazón clementísimo de Jesús, bondadosamente inclinado a ayudarnos siempre, por el cual ofreció el Eterno Padre que oiría siempre nuestras oraciones, diciendo: «Pídeme por el Corazón de mi amantísimo Hijo Jesús; por este Corazón te oiré, y alcanzarás cuanto me pides». Presento sobre Ti a tu Eterno Padre todas mis peticiones, para conseguir el fruto que deseo.
-
-            Dame la gracia de resarcir las injurias e ingratitudes hechas contra Ti oh amante Corazón, y la que te pido ahora, si es para mayor gloria de Dios, adoración y devoción tuya, y bien de mi alma. Amén`,
-        },
-    ]
-  },
-    {
-    dia: 8,
-    contenido: [
-        {
-            tipo: "oracion",
-            texto: oracioninicionovenaSagradoCorazon
-        },
-        {
-            tipo: "texto",
-            texto: `Día 8
-            Oh Corazón amantísimo de Jesús, trono ígneo y lucidísimo, inflamado en el amor de los hombres, a quienes deseas abrasados mutuamente en Tu amor. Yo deseo vivir siempre respirando llamas de Amor Divino en que me abrase, y con que encienda a todo el mundo, para que te responda amante y obsequioso
-
-            Dame la gracia de resarcir las injurias e ingratitudes hechas contra Ti, oh amante Corazón, y la que te pido ahora, si es para mayor gloria de Dios, adoración y devoción tuya, y bien de mi alma. Amén`,
-        },
-    ]
-  },
-    {
-    dia: 9,
-    contenido: [
-        {
-            tipo: "oracion",
-            texto: oracionPadreEternonovenaSagradoCorazon
-        },
-        {
-            tipo: "texto",
-            texto: `Día 9
-            Oh Corazón dolorosísimo de Jesús, que para ablandar nuestra dureza y hacer más patente el amor con que padeciste tantos dolores y penas para salvarnos, los quisiste representar en la cruz, corona de espinas y herida de la lanza, con que te manifestaste paciente y amante al mismo tiempo.
-
-            Dame la gracia de resarcir las injurias e ingratitudes hechas contra Ti, oh amante Corazón, y la que te pido ahora, si es para mayor gloria de Dios, culto tuyo y bien de mi alma. Amén`,
-        },
-    ]
-  },
-];
 // Novena a la Divina Misericordia
  
 const letaniasDivinaMisericordia = `
@@ -783,7 +734,7 @@ Por eso cantaré las Misericordias de Dios para siempre.
 `;
 const coronillaDivinaMisericordia = [
     // INICIO
-    "Misericodia Divina, en Ti confío",
+    "Misericordia Divina, en Ti confío",
         // MISTERIO 1 
     PadreEterno,
     ...Array(10).fill(SuPasion),
@@ -808,135 +759,37 @@ const coronillaDivinaMisericordia = [
     AguaySangre
 ];
 
-const novenaDivinaMisericordia = [
-  {
-    dia: 1,
-    contenido: [
-        {
-            tipo: "texto",
-            texto: `Día 1
-            Hoy, tráeme a toda la humanidad y especialmente a todos los pecadores, y sumérgelos en el mar de mi misericordia. De esta forma me consolarás de la amarga tristeza en que me sumerge la pérdida de las almas.
-
-            Jesús tan misericordioso, cuya naturaleza es la de tener compasión de nosotros y de perdonarnos, no mires nuestros pecados, sino la confianza que depositamos en tu bondad infinita. Acógenos en la morada de tu muy compasivo Corazón y nunca nos dejes salir de Él. Te lo suplicamos por tu amor que te une al Padre y al Espíritu Santo.
-
-            Padre eterno, mira con misericordia a toda la humanidad y especialmente a los pobres pecadores que están encerrados en el Corazón de Jesús lleno de compasión, y por su dolorosa Pasión muéstranos tu misericordia para que alabemos su omnipotencia por los siglos de los siglos. Amén.`,  
-        }
-    ]
-  },
-  
-  {
-    dia: 2,
-    contenido: [
-        {
-            tipo: "texto",
-            texto: `Día 2
-            Hoy, tráeme a las almas de los sacerdotes y las almas de los religiosos, y sumérgelas en mi misericordia insondable. Fueron ellas las que me dieron fortaleza para soportar mi amarga Pasión. A través de ellas, como a través de canales, mi misericordia fluye hacia la humanidad.
-
-            Jesús misericordiosísimo, de quien procede todo bien, aumenta tu gracia en nosotros para que realicemos dignas obras de misericordia, de manera que todos aquellos que nos vean, glorifiquen al Padre de misericordia que está en el cielo.
-
-            Padre eterno, mira con misericordia al grupo elegido de tu viña, a las almas de los sacerdotes y a las almas de los religiosos; otórgales el poder de tu bendición. Por el amor del Corazón de tu Hijo, en el cual están encerradas, concédeles el poder de tu luz para que puedan guiar a otros en el camino de la salvación, y a una sola voz canten alabanzas de tu misericordia sin límite por los siglos de los siglos. Amén.`,  
-        }
-    ]
-  },
-  {
-    dia: 3,
-    contenido: [
-        {
-            tipo: "texto",
-            texto: `Día 3
-            Hoy, tráeme a todas las almas devotas y fieles, y sumérgelas en el mar de mi misericordia. Estas almas me consolaron a lo largo del Vía Crucis. Fueron una gota de consuelo en medio de un mar de amargura.
-
-            Jesús infinitamente compasivo, que desde el tesoro de tu misericordia les concedes a todos tus gracias en gran abundancia, acógenos en la morada de tu clementísimo Corazón y nunca nos dejes escapar de Él. Te lo suplicamos por el inconcebible amor tuyo con que tu Corazón arde por el Padre celestial.
-
-            Padre eterno, mira con misericordia a las almas fieles como herencia de tu Hijo y por su dolorosa Pasión, concédeles tu bendición y rodéalas con tu protección constante para que no pierdan el amor y el tesoro de la santa fe, sino que con toda la legión de los ángeles y los santos, glorifiquen tu infinita misericordia por los siglos de los siglos. Amén.`,
-        }
-    ]
-  },
-  {
-    dia: 4,
-    contenido: [
-        {
-            tipo: "texto",
-            texto: `Día 4
-            Hoy, tráeme a los paganos y aquellos que todavía no me conocen. También pensaba en ellos durante mi amarga Pasión y su futuro celo consoló mi Corazón. Sumérgelos en el mar de mi misericordia.
-
-            Jesús compasivísimo, que eres la luz del mundo entero. Acoge en la morada de tu piadosísimo Corazón a las almas de los paganos que todavía no te conocen. Que los rayos de tu gracia las iluminen para que también ellas unidas a nosotros, ensalcen tu misericordia admirable y no las dejes salir de la morada de tu compasivísimo Corazón.
-
-            Padre eterno, mira con misericordia a las almas de los paganos y de los que todavía no te conocen, pero que están encerrados en el muy compasivo Corazón de Jesús. Atráelas hacia la luz del Evangelio. Estas almas desconocen la gran felicidad que es amarte. Concédeles que también ellas ensalcen la generosidad de tu misericordia por los siglos de los siglos. Amén.`,
-        }
-    ]
-  },
-  {
-    dia: 5,
-    contenido: [
-        {
-            tipo: "texto",
-            texto: `Día 5
-            Hoy, tráeme a las almas de los hermanos separados, y sumérgelas en el mar de mi misericordia. Durante mi amarga Pasión, desgarraron mi cuerpo y mi Corazón, es decir, mi Iglesia. Según regresan a la Iglesia, mis llagas cicatrizan y de este modo alivian mi Pasión.
-
-            Jesús sumamente misericordioso, que eres la bondad misma, Tú no niegas la luz a quienes te la piden. Acoge en la morada de tu muy compasivo Corazón a las almas de los hermanos separados y llévalas con tu luz a la unidad con la Iglesia; no las dejes alejarse de la morada de tu compasivísimo Corazón, sino haz que también ellas glorifiquen la generosidad de tu misericordia.
-
-            Padre eterno, mira con misericordia a las almas de los hermanos separados que han malgastado tus beneficios y han abusado de tus gracias por persistir obstinadamente en sus errores. No mires sus errores, sino el amor de tu Hijo y su amarga Pasión que sufrió por ellos ya que también ellos están acogidos en el sumamente compasivo Corazón de Jesús. Haz que también ellos glorifiquen tu gran misericordia por los siglos de los siglos. Amén.`,
-        }
-    ]
-  },
-  {
-    dia: 6,
-    contenido: [
-        {
-            tipo: "texto",
-            texto: `Día 6
-            Hoy, tráeme a las almas mansas y humildes y a las almas de los niños pequeños, y sumérgelas en mi misericordia. Éstas son las almas más semejantes a mi Corazón. Ellas me fortalecieron durante mi amarga agonía. Las veía como ángeles terrestres que velarían al pie de mis altares. Sobre ellas derramo torrentes enteros de gracias. Solamente el alma humilde es capaz de receive mi gracia; concedo mi confianza a las almas humildes.
-
-            Jesús, tan misericordioso, Tú mismo has dicho: “Aprendan de mí que soy manso y humilde de corazón”. Acoge en la morada de tu compasivísimo Corazón a las almas mansas y humildes y a las almas de los niños pequeños. Estas almas llevan a todo el cielo al éxtasis y son las preferidas del Padre celestial. Son un ramillete perfumado ante el trono de Dios, de cuyo perfume se deleita Dios mismo. Estas almas tienen una morada permanente en tu compasivísimo Corazón y cantan sin cesar un himno de amor y misericordia por la eternidad.
-
-            Padre eterno, mira con misericordia a las almas mansas y humildes y a las almas de los niños pequeños que están encerradas en el muy compasivo Corazón de Jesús. Estas almas son las más semejantes a tu Hijo. Su fragancia asciende desde la tierra y alcanza tu trono. Padre de misericordia y de toda bondad, te suplico por el amor que tienes por estas almas y el gozo que te proporcionan, bendice al mundo entero para que todas las almas canten juntas las alabanzas de tu misericordia por los siglos de los siglos. Amén.`,
-        }
-    ]
-  },
-  {
-    dia: 7,
-    contenido: [
-        {
-            tipo: "texto",
-            texto: `Día 7
-            Hoy, tráeme a las almas que veneran y glorifican mi misericordia de modo especial y sumérgelas en mi misericordia. Estas almas son las que más lamentaron mi Pasión y penetraron más profundamente en mi espíritu. Ellas son un reflejo viviente de mi Corazón compasivo. Estas almas resplandecerán con un resplandor especial en la vida futura. Ninguna de ellas irá al fuego del infierno. Defenderé de modo especial a cada una en la hora de la muerte.
-
-            Jesús misericordiosísimo, cuyo Corazón es el amor mismo, acoge en la morada de tu compasivísimo Corazón a las almas que veneran y ensalzan de modo particular la grandeza de tu misericordia. Estas almas son fuertes con el poder de Dios mismo. En medio de toda clase de aflicciones y adversidades siguen adelante confiadas en tu misericordia, y unidas a ti, cargan sobre sus hombros a toda la humanidad. Estas almas no serán juzgadas severamente, sino que tu misericordia las protegerá en la hora de la muerte.
-
-            Padre eterno, mira con misericordia a aquellas almas que glorifican y veneran tu mayor atributo, es decir, tu misericordia insondable y que están encerradas en el compasivísimo Corazón de Jesús. Estas almas son un Evangelio viviente, sus manos están llenas de obras de misericordia y sus corazones, desbordantes de gozo, te cantan, oh Altísimo, un cántico de misericordia. Te suplico, oh Dios, muéstrales tu misericordia según la esperanza y la confianza que han puesto en ti. Que se cumpla en ellas la promesa de Jesús quien les dijo: A las almas que veneren esta infinita misericordia mía, Yo mismo las defenderé como mi gloria durante sus vidas y especialmente en la hora de la muerte.`,
-        }
-    ]
-  },
-  {
-    dia: 8,
-    contenido: [
-        {
-            tipo: "texto",
-            texto: `Día 8
-            Hoy, tráeme a las almas que están en la cárcel del purgatorio y sumérgelas en el abismo de mi misericordia. Que los torrentes de mi sangre refresquen el ardor del purgatorio. Todas estas almas son muy amadas por mí. Ellas cumplen con el justo castigo que se debe a mi justicia. Está en tu poder llevarles alivio. Haz uso de todas las indulgencias del tesoro de mi Iglesia y ofrécelas en su nombre… Oh, si conocieras los tormentos que ellas sufren ofrecerías continuamente por ellas las limosnas del espíritu y saldarías las deudas que tienen con mi justicia.
-
-            Jesús misericordiosísimo. Tú mismo has dicho que deseas la misericordia; heme aquí que llevo a la morada de tu muy compasivo Corazón a las almas del purgatorio, almas que te son muy queridas, pero que deben pagar su culpa adeudada a tu justicia. Que los torrentes de Sangre y Agua que brotaron de tu Corazón, apaguen el fuego del purgatorio para que también allí sea glorificado el poder de tu misericordia.
-
-            Padre eterno, mira con misericordia a las almas que sufren en el purgatorio y que están encerradas en el muy compasivo Corazón de Jesús. Te suplico por la dolorosa Pasión de Jesús, tu Hijo, y por toda la amargura con la cual su sacratísima alma fue inundada, muestra tu misericordia a las almas que están bajo tu justo escrutinio. No las mires sino a través de las heridas de Jesús, tu amadísimo Hijo, ya que creemos que tu bondad y tu compasión no tienen límites. Amén.`,
-        }
-    ]
-  },
-  {
-    dia: 9,
-    contenido: [
-        {
-            tipo: "texto",
-            texto: `Día 9
-            Hoy, tráeme a las almas tibias y sumérgelas en el abismo de mi misericordia. Estas almas son las que más dolorosamente hieren mi Corazón. A causa de las almas tibias, mi alma experimentó la más intensa repugnancia en el Huerto de los Olivos. A causa de ellas dije: Padre, aleja de mí este cáliz, si es tu voluntad. Para ellas, la última tabla de salvación consiste en recurrir a mi misericordia.
-
-            Jesús piadosísimo, que eres la compasión misma, te traigo a las almas tibias a la morada de tu piadosísimo Corazón. Que estas almas heladas que se parecen a cadáveres y te llenan de gran repugnancia se calienten con el fuego de tu amor puro. Oh Jesús tan compasivo, ejercita la omnipotencia de tu misericordia y atráelas al mismo ardor de tu amor y concédeles el amor santo, porque Tú lo puedes todo.
-
-            Padre eterno, mira con misericordia a las almas tibias que, sin embargo, están acogidas en el piadosísimo Corazón de Jesús. Padre de la misericordia, te suplico por la amarga Pasión de tu Hijo y por su agonía de tres horas en la cruz, permite que también ellas glorifiquen el abismo de tu misericordia. Amén.`, 
-        }
-    ]
-  },
-];
+// Mapa de la novena a la Divina Misericordia
+    const lecturaDiasDivinaMisericordia = [
+        `Hoy, tráeme a toda la humanidad y especialmente a todos los pecadores, y sumérgelos en el mar de mi misericordia. De esta forma me consolarás de la amarga tristeza en que me sumerge la pérdida de las almas.
+        Jesús tan misericordioso, cuya naturaleza es la de tener compasión de nosotros y de perdonarnos, no mires nuestros pecados, sino la confianza que depositamos en tu bondad infinita. Acógenos en la morada de tu muy compasivo Corazón y nunca nos dejes salir de Él. Te lo suplicamos por tu amor que te une al Padre y al Espíritu Santo.
+        Padre eterno, mira con misericordia a toda la humanidad y especialmente a los pobres pecadores que están encerrados en el Corazón de Jesús lleno de compasión, y por su dolorosa Pasión muéstranos tu misericordia para que alabemos su omnipotencia por los siglos de los siglos. Amén.`,
+        `Hoy, tráeme a las almas de los sacerdotes y las almas de los religiosos, y sumérgelas en mi misericordia insondable. Fueron ellas las que me dieron fortaleza para soportar mi amarga Pasión. A través de ellas, como a través de canales, mi misericordia fluye hacia la humanidad.
+        Jesús misericordiosísimo, de quien procede todo bien, aumenta tu gracia en nosotros para que realicemos dignas obras de misericordia, de manera que todos aquellos que nos vean, glorifiquen al Padre de misericordia que está en el cielo.
+        Padre eterno, mira con misericordia al grupo elegido de tu viña, a las almas de los sacerdotes y a las almas de los religiosos; otórgales el poder de tu bendición. Por el amor del Corazón de tu Hijo, en el cual están encerradas, concédeles el poder de tu luz para que puedan guiar a otros en el camino de la salvación, y a una sola voz canten alabanzas de tu misericordia sin límite por los siglos de los siglos. Amén.`,
+        `Hoy, tráeme a todas las almas devotas y fieles, y sumérgelas en el mar de mi misericordia. Estas almas me consolaron a lo largo del Vía Crucis. Fueron una gota de consuelo en medio de un mar de amargura.
+        Jesús infinitamente compasivo, que desde el tesoro de tu misericordia les concedes a todos tus gracias en gran abundancia, acógenos en la morada de tu clementísimo Corazón y nunca nos dejes escapar de Él. Te lo suplicamos por el inconcebible amor tuyo con que tu Corazón arde por el Padre celestial.
+        Padre eterno, mira con misericordia a las almas fieles como herencia de tu Hijo y por su dolorosa Pasión, concédeles tu bendición y rodéalas con tu protección constante para que no pierdan el amor y el tesoro de la santa fe, sino que con toda la legión de los ángeles y los santos, glorifiquen tu infinita misericordia por los siglos de los siglos. Amén.`,
+        `Hoy, tráeme a los paganos y aquellos que todavía no me conocen. También pensaba en ellos durante mi amarga Pasión y su futuro celo consoló mi Corazón. Sumérgelos en el mar de mi misericordia.
+        Jesús compasivísimo, que eres la luz del mundo entero. Acoge en la morada de tu piadosísimo Corazón a las almas de los paganos que todavía no te conocen. Que los rayos de tu gracia las iluminen para que también ellas unidas a nosotros, ensalcen tu misericordia admirable y no las dejes salir de la morada de tu compasivísimo Corazón.
+        Padre eterno, mira con misericordia a las almas de los paganos y de los que todavía no te conocen, pero que están encerrados en el muy compasivo Corazón de Jesús. Atráelas hacia la luz del Evangelio. Estas almas desconocen la gran felicidad que es amarte. Concédeles que también ellas ensalcen la generosidad de tu misericordia por los siglos de los siglos. Amén.`,
+        `Hoy, tráeme a las almas de los hermanos separados, y sumérgelas en el mar de mi misericordia. Durante mi amarga Pasión, desgarraron mi cuerpo y mi Corazón, es decir, mi Iglesia. Según regresan a la Iglesia, mis llagas cicatrizan y de este modo alivian mi Pasión.
+        Jesús sumamente misericordioso, que eres la bondad misma, Tú no niegas la luz a quienes te la piden. Acoge en la morada de tu muy compasivo Corazón a las almas de los hermanos separados y llévalas con tu luz a la unidad con la Iglesia; no las dejes alejarse de la morada de tu compasivísimo Corazón, sino haz que también ellas glorifiquen la generosidad de tu misericordia.
+        Padre eterno, mira con misericordia a las almas de los hermanos separados que han malgastado tus beneficios y han abusado de tus gracias por persistir obstinadamente en sus errores. No mires sus errores, sino el amor de tu Hijo y su amarga Pasión que sufrió por ellos ya que también ellos están acogidos en el sumamente compasivo Corazón de Jesús. Haz que también ellos glorifiquen tu gran misericordia por los siglos de los siglos. Amén.`,
+        `Hoy, tráeme a las almas mansas y humildes y a las almas de los niños pequeños, y sumérgelas en mi misericordia. Éstas son las almas más semejantes a mi Corazón. Ellas me fortalecieron durante mi amarga agonía. Las veía como ángeles terrestres que velarían al pie de mis altares. Sobre ellas derramo torrentes enteros de gracias. Solamente el alma humilde es capaz de recibir mi gracia; concedo mi confianza a las almas humildes.
+        Jesús, tan misericordioso, Tú mismo has dicho: “Aprendan de mí que soy manso y humilde de corazón”. Acoge en la morada de tu compasivísimo Corazón a las almas mansas y humildes y a las almas de los niños pequeños. Estas almas llevan a todo el cielo al éxtasis y son las preferidas del Padre celestial. Son un ramillete perfumado ante el trono de Dios, de cuyo perfume se deleita Dios mismo. Estas almas tienen una morada permanente en tu compasivísimo Corazón y cantan sin cesar un himno de amor y misericordia por la eternidad.
+        Padre eterno, mira con misericordia a las almas mansas y humildes y a las almas de los niños pequeños que están encerradas en el muy compasivo Corazón de Jesús. Estas almas son las más semejantes a tu Hijo. Su fragancia asciende desde la tierra y alcanza tu trono. Padre de misericordia y de toda bondad, te suplico por el amor que tienes por estas almas y el gozo que te proporcionan, bendice al mundo entero para que todas las almas canten juntas las alabanzas de tu misericordia por los siglos de los siglos. Amén.`,
+        `Hoy, tráeme a las almas que veneran y glorifican mi misericordia de modo especial y sumérgelas en mi misericordia. Estas almas son las que más lamentaron mi Pasión y penetraron más profundamente en mi espíritu. Ellas son un reflejo viviente de mi Corazón compasivo. Estas almas resplandecerán con un resplandor especial en la vida futura. Ninguna de ellas irá al fuego del infierno. Defenderé de modo especial a cada una en la hora de la muerte.
+        Jesús misericordiosísimo, cuyo Corazón es el amor mismo, acoge en la morada de tu compasivísimo Corazón a las almas que veneran y ensalzan de modo particular la grandeza de tu misericordia. Estas almas son fuertes con el poder de Dios mismo. En medio de toda clase de aflicciones y adversidades siguen adelante confiadas en tu misericordia, y unidas a ti, cargan sobre sus hombros a toda la humanidad. Estas almas no serán juzgadas severamente, sino que tu misericordia las protegerá en la hora de la muerte.
+        Padre eterno, mira con misericordia a aquellas almas que glorifican y veneran tu mayor atributo, es decir, tu misericordia insondable y que están encerradas en el compasivísimo Corazón de Jesús. Estas almas son un Evangelio viviente, sus manos están llenas de obras de misericordia y sus corazones, desbordantes de gozo, te cantan, oh Altísimo, un cántico de misericordia. Te suplico, oh Dios, muéstrales tu misericordia según la esperanza y la confianza que han puesto en ti. Que se cumpla en ellas la promesa de Jesús quien les dijo: A las almas que veneren esta infinita misericordia mía, Yo mismo las defenderé como mi gloria durante sus vidas y especialmente en la hora de la muerte.`,
+        `Hoy, tráeme a las almas que están en la cárcel del purgatorio y sumérgelas en el abismo de mi misericordia. Que los torrentes de mi sangre refresquen el ardor del purgatorio. Todas estas almas son muy amadas por mí. Ellas cumplen con el justo castigo que se debe a mi justicia. Está en tu poder llevarles alivio. Haz uso de todas las indulgencias del tesoro de mi Iglesia y ofrécelas en su nombre… Oh, si conocieras los tormentos que ellas sufren ofrecerías continuamente por ellas las limosnas del espíritu y saldarías las deudas que tienen con mi justicia.
+        Jesús misericordiosísimo. Tú mismo has dicho que deseas la misericordia; heme aquí que llevo a la morada de tu muy compasivo Corazón a las almas del purgatorio, almas que te son muy queridas, pero que deben pagar su culpa adeudada a tu justicia. Que los torrentes de Sangre y Agua que brotaron de tu Corazón, apaguen el fuego del purgatorio para que también allí sea glorificado el poder de tu misericordia.
+        Padre eterno, mira con misericordia a las almas que sufren en el purgatorio y que están encerradas en el muy compasivo Corazón de Jesús. Te suplico por la dolorosa Pasión de Jesús, tu Hijo, y por toda la amargura con la cual su sacratísima alma fue inundada, muestra tu misericordia a las almas que están bajo tu justo escrutinio. No las mires sino a través de las heridas de Jesús, tu amadísimo Hijo, ya que creemos que tu bondad y tu compasión no tienen límites. Amén.`,
+        `Hoy, tráeme a las almas tibias y sumérgelas en el abismo de mi misericordia. Estas almas son las que más dolorosamente hieren mi Corazón. A causa de las almas tibias, mi alma experimentó la más intensa repugnancia en el Huerto de los Olivos. A causa de ellas dije: Padre, aleja de mí este cáliz, si es tu voluntad. Para ellas, la última tabla de salvación consiste en recurrir a mi misericordia.
+        Jesús piadosísimo, que eres la compasión misma, te traigo a las almas tibias a la morada de tu piadosísimo Corazón. Que estas almas heladas que se parecen a cadáveres y te llenan de gran repugnancia se calienten con el fuego de tu amor puro. Oh Jesús tan compasivo, ejercita la omnipotencia de tu misericordia y atráelas al mismo ardor de tu amor y concédeles el amor santo, porque Tú lo puedes todo.
+        Padre eterno, mira con misericordia a las almas tibias que, sin embargo, están acogidas en el piadosísimo Corazón de Jesús. Padre de la misericordia, te suplico por la amarga Pasión de tu Hijo y por su agonía de tres horas en la cruz, permite que también ellas glorifiquen el abismo de tu misericordia. Amén.`
+    ];
+    const novenaDivinaMisericordia = crearDiasNovena(lecturaDiasDivinaMisericordia);
 
 // Novena al Espíritu Santo
   
@@ -988,10 +841,10 @@ De todo pecado e imperfección y de todo mal,
 
 Padre amantísimo,	Perdónanos.
 Divino Verbo,	Ten misericordia de nosotros.
-Santo y Divino Espíritu,	No nos dejes hasta ponemos en la posesión de la Divina Esencia, Cielo de los cielos.
+Santo y Divino Espíritu,	No nos dejes hasta ponernos en la posesión de la Divina Esencia, Cielo de los cielos.
 
 Cordero de Dios, que quitas el pecado del mundo,	Envíanos al divino Consolador.
-Cordero de Dios, que quitas el pecado del mundo,	Llenanos de los dones del Espíritu.
+Cordero de Dios, que quitas el pecado del mundo,	Llénanos de los dones del Espíritu.
 Cordero de Dios, que quitas el pecado del mundo,	Haz que crezcan en nosotros los frutos del Espíritu Santo.
 
 Ven, ¡oh Santo Espíritu!, llena los corazones de tus fieles y enciende en ellos el fuego de tu amor.
@@ -999,158 +852,42 @@ Ven, ¡oh Santo Espíritu!, llena los corazones de tus fieles y enciende en ello
 V. Envía tu Espíritu y todo será creado.
 R. Y se renovará la faz de la tierra.
 `;
-const coronillaEspirituSanto = [
-    // INICIO
-    SecuenciaPentecostes,
-        // MISTERIO 1 
-        ...Array(10).fill(VenPorMaria),
-        QueHare,
-        // MISTERIO 2 
-        ...Array(10).fill(VenPorMaria),
-        QueHare,
-        // MISTERIO 3 
-        ...Array(10).fill(VenPorMaria),
-        QueHare,
-        // MISTERIO 4 
-        ...Array(10).fill(VenPorMaria),
-        QueHare,
-        // MISTERIO 5 
-        ...Array(10).fill(VenPorMaria),
-        QueHare,
-        // FINAL
-    PADRE_NUESTRO,
-    AVE_MARIA,
-    GLORIA
-];
 
-const novenaEspirituSanto = [
-  {
-    dia: 1,
-    contenido: [
-        {
-            tipo: "oracion",
-            texto: VeniCreator
-        },
-        {
-            tipo: "texto",
-            texto: `Día 1
-            Ven, Espíritu Santo, por tu don Sabiduría, concédenos la gracia de apreciar y estimar los bienes del cielo y muéstranos los medios para alcanzarlos.`,
-        },
-        {
-            tipo: "oracion",
-            texto: GLORIA
-        },
-    ]
-  },
-  {
-    dia: 2,
-    contenido: [
-        {
-            tipo: "oracion",
-            texto: VeniCreator
-        },
-        {
-            tipo: "texto",
-            texto: `Día 2
-            Ven, Espíritu Santo, por tu don de Entendimiento, ilumina nuestras mentes respecto a los misterios de la salvación, para que podamos comprenderlos perfectamente y abrazarlos con fervor`,
-        },
-        {
-            tipo: "oracion",
-            texto: GLORIA
-        },
-    ]
-  },
-  {
-    dia: 3,
-    contenido: [
-        {
-            tipo: "oracion",
-            texto: VeniCreator
-        },
-        {
-            tipo: "texto",
-            texto: `Día 3
-            Ven, Espíritu Santo, por tu don de Consejo, inclina nuestros corazones a actuar con rectitud y justicia para beneficio de nosotros mismos y de nuestros semejantes. `,
-        },
-        {
-            tipo: "oracion",
-            texto: GLORIA
-        },
-    ]
-  },
-  {
-    dia: 4,
-    contenido: [
-        {
-            tipo: "oracion",
-            texto: VeniCreator
-        },
-        {
-            tipo: "texto",
-            texto: `Día 4
-            Ven, Espíritu Santo, por tu don de Fortaleza, fortalécenos con tu gracia contra los enemigos de nuestra alma, para que podamos obtener la corona de la victoria.`,
-        },
-        {
-            tipo: "oracion",
-            texto: GLORIA
-        },
-    ]
-  },
-  {
-    dia: 5,
-    contenido: [
-        {
-            tipo: "oracion",
-            texto: VeniCreator
-        },
-        {
-            tipo: "texto",
-            texto: `Día 5
-            Ven, Espíritu Santo, por tu don de Ciencia, enséñanos a vivir entre las cosas terrenos para así no perder las eternas.`,
-        },
-        {
-            tipo: "oracion",
-            texto: GLORIA
-        },
-    ]
-  },
-  {
-    dia: 6,
-    contenido: [
-        {
-            tipo: "oracion",
-            texto: VeniCreator
-        },
-        {
-            tipo: "texto",
-            texto: `Día 6
-            Ven, Espíritu Santo, por tu don de Piedad, inspíranos a vivir sobria, justa, y piadosamente en esta vida, para alcanzar el cielo en la otra vida.`,
-        },
-        {
-            tipo: "oracion",
-            texto: GLORIA
-        },
-    ]
-  },
-    {
-    dia: 7,
-    contenido: [
-        {
-            tipo: "oracion",
-            texto: VeniCreator
-        },
-        {
-            tipo: "texto",
-            texto: `Día 7
-            Ven, Espíritu Santo, por tu dónde Temor de Dios, hiere nuestros cuerpos con tu temor para así trabajar por la salvación de nuestras almas.`,
-        },
-        {
-            tipo: "oracion",
-            texto: GLORIA
-        },
-    ]
-  },
-];
+    // Creando mapas para la novena al Espíritu Santo
+    const lecturaDiasEspirituSanto = [
+        "Ven, Espíritu Santo, por tu don de Sabiduría, concédenos la gracia de apreciar y estimar los bienes del cielo y muéstranos los medios para alcanzarlos",
+        "Ven, Espíritu Santo, por tu don de Entendimiento, ilumina nuestras mentes respecto a los misterios de la salvación, para que podamos comprenderlos perfectamente y abrazarlos con fervor",
+        "Ven, Espíritu Santo, por tu don de Consejo, inclina nuestros corazones a actuar con rectitud y justicia para beneficio de nosotros mismos y de nuestros semejantes",
+        "Ven, Espíritu Santo, por tu don de Fortaleza, fortalécenos con tu gracia contra los enemigos de nuestra alma, para que podamos obtener la corona de la victoria",
+        "Ven, Espíritu Santo, por tu don de Ciencia, enséñanos a vivir entre las cosas terrenas para así no perder las eternas",
+        "Ven, Espíritu Santo, por tu don de Piedad, inspíranos a vivir sobria, justa, y piadosamente en esta vida, para alcanzar el cielo en la otra vida",
+        "Ven, Espíritu Santo, por tu don de Temor de Dios, hiere nuestros cuerpos con tu temor para así trabajar por la salvación de nuestras almas"
+    ];
+
+    const novenaEspirituSanto = crearDiasNovena(lecturaDiasEspirituSanto, null, VeniCreator, GLORIA);
+    const coronillaEspirituSanto = [
+        // INICIO
+        SecuenciaPentecostes,
+            // MISTERIO 1 
+            ...Array(10).fill(VenPorMaria),
+            QueHare,
+            // MISTERIO 2 
+            ...Array(10).fill(VenPorMaria),
+            QueHare,
+            // MISTERIO 3 
+            ...Array(10).fill(VenPorMaria),
+            QueHare,
+            // MISTERIO 4 
+            ...Array(10).fill(VenPorMaria),
+            QueHare,
+            // MISTERIO 5 
+            ...Array(10).fill(VenPorMaria),
+            QueHare,
+            // FINAL
+        PADRE_NUESTRO,
+        AVE_MARIA,
+        GLORIA
+    ];
 
 // Novena al Ángel Custodio
   
@@ -1170,7 +907,7 @@ const coronillaAngelCustodio = [
         ...Array(10).fill(Misterio2AngelCustodio),
         "Gracias querido N. pues nunca me dejas en el combate",
         // MISTERIO 3 
-        "Querido Padre, gracias por el Custodio que me has dado, que vigila mis pasos para adecuerlos a los tuyos y me asiste para que, ante la tribulación, no huya de tu voluntad.",
+        "Querido Padre, gracias por el Custodio que me has dado, que vigila mis pasos para adecuarlos a los tuyos y me asiste para que, ante la tribulación, no huya de tu voluntad.",
         ...Array(10).fill(Misterio3AngelCustodio),
         "Gracias querido N. pues me vigilas noche y día",
         // MISTERIO 4 
@@ -1180,7 +917,7 @@ const coronillaAngelCustodio = [
         // MISTERIO 5 
         "Querido Padre, gracias por el Custodio que me has dado, compañero en esta vida con el objeto de poder encontrarnos en la Eterna",
         ...Array(10).fill(Misterio5AngelCustodio),
-        "Gracias querido N. ¡Que ganas tengo de que nos veamos!",
+        "Gracias querido N. ¡Qué ganas tengo de que nos veamos!",
     // FINAL
         PADRE_NUESTRO,
         AVE_MARIA,
@@ -1188,143 +925,29 @@ const coronillaAngelCustodio = [
         OracionFinalCoronillaAngelCustodio
 ];
 
-const novenaAngelCustodio = [
-  {
-    dia: 1,
-    contenido: [
-        {
-            tipo: "oracion",
-            texto: OracionBerchmansAngelCustodio
-        },
-        {
-            tipo: "texto",
-            texto: `Día 1
-            ¡Oh buen Ángel custodio! ayúdame a dar gracias al Altísimo por haberse dignado destinarte a mi guarda.
-            Te pido que por intercesión de María, me alcances de Dios un fervoroso espíritu y la práctica de una oración constante para agradecer a Dios todos sus beneficios, y especialmente el de tenerte por celestial custodio mío`,
-        }
-    ]
-  },
-  {
-    dia: 2,
-    contenido: [
-        {
-            tipo: "oracion",
-            texto: OracionBerchmansAngelCustodio
-        },
-        {
-            tipo: "texto",
-            texto: `Día 2
-            ¡Oh Príncipe celestial!, dígnate obtenerme el perdón de todas las ofensas que os he hecho a Dios y a ti, despreciando vuestras amenazas consejos.
-            Te pido que, por intercesión de María, me alcances de Dios un verdadero dolor de los pecados, que me obtenga el perdón de todas las faltas y caídas de la vida pasada`,
-        }
-    ]
-  },
-  {
-    dia: 3,
-    contenido: [
-        {
-            tipo: "oracion",
-            texto: OracionBerchmansAngelCustodio
-        },
-        {
-            tipo: "texto",
-            texto: `Día 3
-            ¡Oh mi Tutor amoroso!, infunde en mi alma un profundo respeto hacia ti, de tal manera que jamás tenga el atrevimiento de hacer cosa alguna que te desagrade.
-            Te pido que, por intercesión de María, me alcances de Dios el recuerdo de la presencia divina y el respeto a tu presencia continua, las cuales han de guardarme del pecado`,
-        }
-    ]
-  },
-  {
-    dia: 4,
-    contenido: [
-        {
-            tipo: "oracion",
-            texto: OracionBerchmansAngelCustodio
-        },
-        {
-            tipo: "texto",
-            texto: `Día 4
-            ¡Oh Médico compasivo!, enséñame el remedio y dame el auxilio para curar mis malos hábitos y tantas miserias como oprimen mi alma.
-            Te pido que, por intercesión de María, me alcances de Dios un verdadero espíritu de mortificación, con el cual domine mis malas pasiones y la sensualidad, y obtenga la paz y la libertad de espíritu, juntamente con las demás virtudes`,
-        }
-    ]
-  },
-  {
-    dia: 5,
-    contenido: [
-        {
-            tipo: "oracion",
-            texto: OracionBerchmansAngelCustodio
-        },
-        {
-            tipo: "texto",
-            texto: `Día 5
-            ¡Oh, mi Guía fiel!, alcánzame fuerza para vencer todos los obstáculos que se encuentren en el camino de la existencia y para sufrir pacientemente las tribulaciones de esta miserable vida.
-            Te pido que, por intercesión de María, me alcances de Dios una verdadera paciencia y conformidad en todas las contrariedades y penas de la vida que Dios pueda permitir para mi santificación`,
-        }       
-    ] 
-},
-  {
-    dia: 6,
-    contenido: [
-        {
-            tipo: "oracion",
-            texto: OracionBerchmansAngelCustodio
-        },
-        {
-            tipo: "texto",
-            texto: `Día 6
-            ¡Oh Intercesor eficaz cerca de Dios!, alcánzame la gracia de seguir prontamente tus santas inspiraciones y de conformar, en todo y para siempre, mi voluntad a la de Dios.
-            Te pido que, por la intercesión de María, me alcances de Dios una obediencia absoluta a todos mis superiores, la cual me santifique por el cumplimiento de la voluntad divina en ella manifestada`,
-        }
-    ]
-  },
-  {
-    dia: 7,
-    contenido: [
-        {
-            tipo: "oracion",
-            texto: OracionBerchmansAngelCustodio
-        },
-        {
-            tipo: "texto",
-            texto: `Día 7
-            ¡Oh Espíritu purísimo, encendido todo en amor de Dios!, alcánzame este fuego divino, y al mismo tiempo una verdadera devoción a tu augusta Reina y buena Madre mía, la Virgen Santísima.
-            Te pido que, por intercesión de María, me obtengas de Dios la caridad perfecta y la devoción a María, que sean para mí fuente abundantísima de méritos, camino segurísimo de salvación y el más dulce consuelo en la hora de la muerte`,
-        }
-    ]
-  },
-  {
-    dia: 8,
-    contenido: [
-        {
-            tipo: "oracion",
-            texto: OracionBerchmansAngelCustodio
-        },
-        {
-            tipo: "texto",
-            texto: `Día 8
-            ¡Oh invencible Protector!, asísteme a fin de corresponder dignamente a tu amor y a tus beneficios, y para trabajar con todas las fuerzas en promover tu culto y devoción.
-            Igualmente te pido que, por intercesión de María, me alcances de Dios un celo fervoroso para la práctica del bien y una fervorosa devoción angélica, que sean mi propia santificación y la del prójimo`,
-        }
-    ]
-  },
-  {
-    dia: 9,
-    contenido: [
-        {
-            tipo: "oracion",
-            texto: OracionBerchmansAngelCustodio
-        },
-        {
-            tipo: "texto",
-            texto: `Día 9
-            ¡Oh bienaventurado ministro del Altísimo!, alcánzame de su misericordia infinita que llegue yo a ocupar un día uno de los tronos que dejaron vacíos los ángeles rebeldes.
-            Te pido que, por intercesión de María, me obtengas de Dios la gracia de una muerte santa, confortado con los Santos Sacramentos, confesado y en Gracia, que me abra las puertas de la gloria eterna`,
-        }
-    ]
-  },
-];
+// Creando mapas para la novena al Ángel Custodio
+    const lecturaDiasAngelCustodio = [
+        `¡Oh, buen Ángel custodio! ayúdame a dar gracias al Altísimo por haberse dignado destinarte a mi guarda.
+        Te pido que por intercesión de María, me alcances de Dios un fervoroso espíritu y la práctica de una oración constante para agradecer a Dios todos sus beneficios, y especialmente el de tenerte por celestial custodio mío`,
+        `¡Oh, Príncipe celestial!, dígnate obtenerme el perdón de todas las ofensas que os he hecho a Dios y a ti, despreciando vuestras amenazas y consejos.
+        Te pido que, por intercesión de María, me alcances de Dios un verdadero dolor de los pecados, que me obtenga el perdón de todas las faltas y caídas de la vida pasada`,
+        `¡Oh, mi Tutor amoroso!, infunde en mi alma un profundo respeto hacia ti, de tal manera que jamás tenga el atrevimiento de hacer cosa alguna que te desagrade.
+        Te pido que, por intercesión de María, me alcances de Dios el recuerdo de la presencia divina y el respeto a tu presencia continua, las cuales han de guardarme del pecado`,
+        `¡Oh, Médico compasivo!, enséñame el remedio y dame el auxilio para curar mis malos hábitos y tantas miserias como oprimen mi alma.
+        Te pido que, por intercesión de María, me alcances de Dios un verdadero espíritu de mortificación, con el cual domine mis malas pasiones y la sensualidad, y obtenga la paz y la libertad de espíritu, juntamente con las demás virtudes`,
+        `¡Oh, mi Guía fiel!, alcánzame fuerza para vencer todos los obstáculos que se encuentren en el camino de la existencia y para sufrir pacientemente las tribulaciones de esta miserable vida.
+        Te pido que, por intercesión de María, me alcances de Dios una verdadera paciencia y conformidad en todas las contrariedades y penas de la vida que Dios pueda permitir para mi santificación.`,
+        `¡Oh Intercesor eficaz cerca de Dios!, alcánzame la gracia de seguir prontamente tus santas inspiraciones y de conformar, en todo y para siempre, mi voluntad a la de Dios.
+        Te pido que, por la intercesión de María, me alcances de Dios una obediencia absoluta a todos mis superiores, la cual me santifique por el cumplimiento de la voluntad divina en ella manifestada.`,
+        `¡Oh, Espíritu purísimo, encendido todo en amor de Dios!, alcánzame este fuego divino, y al mismo tiempo una verdadera devoción a tu augusta Reina y buena Madre mía, la Virgen Santísima.
+        Te pido que, por intercesión de María, me obtengas de Dios la caridad perfecta y la devoción a María, que sean para mí fuente abundantísima de méritos, camino segurísimo de salvación y el más dulce consuelo en la hora de la muerte`,
+        `¡Oh, invencible Protector!, asísteme a fin de corresponder dignamente a tu amor y a tus beneficios, y para trabajar con todas las fuerzas en promover tu culto y devoción.
+        Igualmente te pido que, por intercesión de María, me alcances de Dios un celo fervoroso para la práctica del bien y una fervorosa devoción angélica, que sean mi propia santificación y la del prójimo.`,
+        `¡Oh, bienaventurado ministro del Altísimo!, alcánzame de su misericordia infinita que llegue yo a ocupar un día uno de los tronos que dejaron vacíos los ángeles rebeldes.
+        Te pido que, por intercesión de María, me obtengas de Dios la gracia de una muerte santa, confortado con los Santos Sacramentos, confesado y en Gracia, que me abra las puertas de la gloria eterna.`
+    ];
+    const novenaAngelCustodio = crearDiasNovena(lecturaDiasAngelCustodio, null, OracionBerchmansAngelCustodio);
+
 // Novena de la castidad
 const coronillaCastidad = [
     // INICIO
@@ -1353,105 +976,22 @@ const coronillaCastidad = [
     OracionEclesiastico
 ];
 
-const novenaCastidad = [
-    {
-    dia: 1,
-    contenido: [
-        {
-            tipo: "texto",
-            texto: `Día 1 - José de Egipto
-                Él puso todo lo que poseía en manos de José, sin preocuparse de otra cosa que del pan que comía. José era de buen tipo y bello semblante. Después de cierto tiempo, la mujer de su amo puso sus ojos en José y le dijo: «Acuéstate conmigo». Pero él rehusó, y dijo a la mujer de su amo: «Mira, mi amo no se preocupa de lo que hay en la casa y todo lo suyo lo ha puesto en mi mano. Él no ejerce más autoridad en esta casa que yo, y no se ha reservado nada sino a ti, porque eres su mujer. ¿Cómo voy a cometer yo semejante injusticia y a pecar contra Dios?». Y, aunque ella insistía un día y otro, José no accedió a acostarse ni a estar con ella. Pero cierto día entró él en casa para hacer su trabajo y no había ningún criado allí en la casa. Ella lo agarró por su vestido y le dijo: «Acuéstate conmigo». Pero él, dejando el vestido en su mano, salió afuera y huyó.
-                (Gn 39, 6-12) `,
-        },
-        {
-            tipo: "texto",
-            texto: `Señor, que enseñaste a José a escapar de la tentación sin importarle las apariencias, concédeme el don de prudencia para huir de la ocasión de pecar, no por fidelidad a los hombres, sino por fidelidad a Ti, el único y buen Señor`,
-        }
-    ]
-  },
-  {
-    dia: 2,
-    contenido: [
-        {
-            tipo: "texto",
-            texto: `Día 2 - La publicana
-                Un fariseo le rogaba que fuera a comer con él y, entrando en casa del fariseo, se recostó a la mesa. En esto, una mujer que había en la ciudad, una pecadora, al enterarse de que estaba comiendo en casa del fariseo, vino trayendo un frasco de alabastro lleno de perfume y, colocándose detrás junto a sus pies, llorando, se puso a regarle los pies con las lágrimas, se los enjugaba con los cabellos de su cabeza, los cubría de besos y se los ungía con el perfume. Al ver esto, el fariseo que lo había invitado se dijo: «Si este fuera profeta, sabría quién y qué clase de mujer es la que lo está tocando, pues es una pecadora». Jesús respondió y le dijo: «Simón, tengo algo que decirte». Él contestó: «Dímelo, Maestro». «Un prestamista tenía dos deudores: uno le debía quinientos denarios y el otro cincuenta. Como no tenían con qué pagar, los perdonó a los dos. ¿Cuál de ellos le mostrará más amor?». Respondió Simón y dijo: «Supongo que aquel a quien le perdonó más». Y él le dijo: «Has juzgado rectamente». Y, volviéndose a la mujer, dijo a Simón: «¿Ves a esta mujer? He entrado en tu casa y no me has dado agua para los pies; ella, en cambio, me ha regado los pies con sus lágrimas y me los ha enjugado con sus cabellos. Tú no me diste el beso de paz; ella, en cambio, desde que entré, no ha dejado de besarme los pies. Tú no me ungiste la cabeza con ungüento; ella, en cambio, me ha ungido los pies con perfume. Por eso te digo: sus muchos pecados han quedado perdonados, porque ha amado mucho, pero al que poco se le perdona, ama poco». Y a ella le dijo: «Han quedado perdonados tus pecados».
-                (Lc 7, 36-48)`,
-        },
-        {
-            tipo: "texto",
-            texto: `Señor, que no te escandalizas de los pecados de la publicana sino que los perdonas. Dame la gracia de llorar mis pecados y regar con mis lágrimas tus pies, para que habiendo sido perdonado mucho, ame mucho y comenzando una nueva vida pueda amarte, bendecirte y alabarte con todos tus santos`,
-        },
-    ]
-   },
-   {
-    dia: 3,
-    contenido: [
-        {
-            tipo: "texto",
-            texto: `Día 3 - Santa Inés
-                Ya veo en lo que consiste, le dice: tu alma, insensible al dolor, ha aprendido a despreciar los suplicios; y así estimas en nada tu vida; pero puede ser que sientas más la pérdida de tu honor mismo. ¿Esa virginidad, qué has consagrado, la darás tan fácilmente como tu vida? Pues sábete que voy a hacerte llevar a un lugar de prostitución, a menos que ahora al punto no humilles tu altanera cabeza ante el altar de nuestros dioses y pidas perdón humildemente a Minerva de haberla despreciado: sábete que es una virgen como tú. Espera pues, servir de placer a una juventud descarada, que se sabe que nada gusta tanto como hallar nuevos objetos a su brutalidad. 
-                No creáis, le respondió Inés, que Jesucristo abandona tan fácilmente a sus esposas. Quiérelas demasiado y las ama con mucha delicadeza para sufrir que se haga perder impunemente su pudor y está siempre pronto a socorrerlas. El os hace dueño de mi cuerpo, para dividirle en mil pedazos si gustais; pero no esperéis que os le entregue para que pueda mancharse su pureza.
-                (De la narración poética del martirio de Santa Inés)`,
-        },
-        {
-            tipo: "texto",
-            texto: `Señor, que hiciste comprende a Santa Inés que su pureza era más valiosa que su vida y que la dignidad de su carne importaba más que la integridad, concédeme defender mi castidad como a mí mismo, entendiendo que una sexualidad al servicio de Satanás y sus ángeles es mucho peor que la propia muerte`,
-        },
-    ]
-  },
-  {
-    dia: 4,
-    contenido: [
-        {
-            tipo: "texto",
-            texto: `Día 4 - Susana
-                Sucedió que, mientras aguardaban ellos el día conveniente, salió ella como los tres días anteriores sola con dos criadas, y tuvo ganas de bañarse en el jardín, porque hacía mucho calor. No había allí nadie, excepto los dos ancianos escondidos y acechándola. Susana dijo a las criadas: —Traedme el perfume y las cremas y cerrad la puerta del jardín mientras me baño. Ellas hicieron lo que les dijo, cerraron la puerta del jardín y salieron por una puerta lateral a traer lo que se les había ordenado, y no vieron a los ancianos porque estaban escondidos. Apenas salieron las criadas, se levantaron los dos ancianos, corrieron hacia ella y le dijeron: —Las puertas del jardín están cerradas, nadie nos ve, y nosotros sentimos deseos de ti; así que consiente y acuéstate con nosotros. Si no, daremos testimonio contra ti diciendo que un joven estaba contigo y que por eso habías despachado a las criadas. Susana lanzó un gemido y dijo: —No tengo salida: si hago eso, mereceré la muerte; si no lo hago, no escaparé de vuestras manos. Pero prefiero no hacerlo y caer en vuestras manos antes que pecar delante del Señor.
-                (Dn 13, 15-23)`,
-        },
-        {
-            tipo: "texto",
-            texto: `Señor, que en la historia de Susana nos enseñaste que es mejor ser difamado entre los hombres que pecar ante ti, ayúdame a que no me importe mi imagen, lo que los demás piensen de mí, incluso las difamaciones o desamores; que esté dispuesto a perderlo todo para permanecer puro ante ti`,
-        },
-        ]
-  },
-  {
-    dia: 5,
-    contenido: [
-        {
-            tipo: "texto",
-            texto: `Día 5 - La adúltera
-                Los escribas y los fariseos le traen una mujer sorprendida en adulterio, y, colocándola en medio, le dijeron: «Maestro, esta mujer ha sido sorprendida en flagrante adulterio. La ley de Moisés nos manda apedrear a las adúlteras; tú, ¿qué dices?». Le preguntaban esto para comprometerlo y poder acusarlo. Pero Jesús, inclinándose, escribía con el dedo en el suelo. Como insistían en preguntarle, se incorporó y les dijo: «El que esté sin pecado, que le tire la primera piedra». E inclinándose otra vez, siguió escribiendo. Ellos, al oírlo, se fueron escabullendo uno a uno, empezando por los más viejos. Y quedó solo Jesús, con la mujer en medio, que seguía allí delante. Jesús se incorporó y le preguntó: «Mujer, ¿dónde están tus acusadores?; ¿ninguno te ha condenado?». Ella contestó: «Ninguno, Señor». Jesús dijo: «Tampoco yo te condeno. Anda, y en adelante no peques más». 
-                (Jn 8, 3-11)`,
-        },
-        {
-            tipo: "texto",
-            texto: `Señor, que no condenaste a la adúltera sino que la levantaste de sus pecados, perdóname también a mí mis caídas y consuela a mi alma con esas palabras tuyas «y en adelante no peques más»`,
-        }
-    ]
-  },
-  {
-    dia: 6,
-    contenido: [
-        {
-            tipo: "texto",
-            texto: `Día 6 - Santa Margarita de Cortona
-            Margarita había vivido varios años en concubinato público y tras la muerte de su amante, Dios tocó su corazón con la conversión. Margarita empezó así una vida de penitencia, oración y caridad, incorporándose a la Tercera Orden Franciscana, y Dios empezó a bendecirla con dones místicos. Cierto día, Cristo le preguntó "¿Quieres que te enseñe el lugar que tengo reservado en el Cielo para ti?" a lo que Margarita asintió con gran alegría. Entonces, Jesús le mostró el Coro de las Vírgenes, aquellas que se habían reservado para su Esposo. Acabada la visión, Margarita se entristeció y le dijo a Jesús "Jesús mío, te has debido equivocar, me has enseñado el Coro de las Vírgenes, y tú me conoces: yo no soy virgen". A lo que Jesús respondió "Eres tú quien se equivoca, mi querida hija y esposa, pues tú eres virgen. Yo hoy te hago virgen de nuevo"
+// Creando mapas para la novena de la castidad
+    const lecturaDiasCastidad = [
+        `Él puso todo lo que poseía en manos de José, sin preocuparse de otra cosa que del pan que comía. José era de buen tipo y bello semblante. Después de cierto tiempo, la mujer de su amo puso sus ojos en José y le dijo: «Acuéstate conmigo». Pero él rehusó, y dijo a la mujer de su amo: «Mira, mi amo no se preocupa de lo que hay en la casa y todo lo suyo lo ha puesto en mi mano. Él no ejerce más autoridad en esta casa que yo, y no se ha reservado nada sino a ti, porque eres su mujer. ¿Cómo voy a cometer yo semejante injusticia y a pecar contra Dios?». Y, aunque ella insistía un día y otro, José no accedió a acostarse ni a estar con ella. Pero cierto día entró él en casa para hacer su trabajo y no había ningún criado allí en la casa. Ella lo agarró por su vestido y le dijo: «Acuéstate conmigo». Pero él, dejando el vestido en su mano, salió afuera y huyó.
+            (Gn 39, 6-12)`,
+        `Un fariseo le rogaba que fuera a comer con él y, entrando en casa del fariseo, se recostó a la mesa. En esto, una mujer que había en la ciudad, una pecadora, al enterarse de que estaba comiendo en casa del fariseo, vino trayendo un frasco de alabastro lleno de perfume y, colocándose detrás junto a sus pies, llorando, se puso a regarle los pies con las lágrimas, se los enjugaba con los cabellos de su cabeza, los cubría de besos y se los ungía con el perfume. Al ver esto, el fariseo que lo había invitado se dijo: «Si este fuera profeta, sabría quién y qué clase de mujer es la que lo está tocando, pues es una pecadora». Jesús respondió y le dijo: «Simón, tengo algo que decirte». Él contestó: «Dímelo, Maestro». «Un prestamista tenía dos deudores: uno le debía quinientos denarios y el otro cincuenta. Como no tenían con qué pagar, los perdonó a los dos. ¿Cuál de ellos le mostrará más amor?». Respondió Simón y dijo: «Supongo que aquel a quien le perdonó más». Y él le dijo: «Has juzgado rectamente». Y, volviéndose a la mujer, dijo a Simón: «¿Ves a esta mujer? He entrado en tu casa y no me has dado agua para los pies; ella, en cambio, me ha regado los pies con sus lágrimas y me los ha enjugado con sus cabellos. Tú no me diste el beso de paz; ella, en cambio, desde que entré, no ha dejado de besarme los pies. Tú no me ungiste la cabeza con ungüento; ella, en cambio, me ha ungido los pies con perfume. Por eso te digo: sus muchos pecados han quedado perdonados, porque ha amado mucho, pero al que poco se le perdona, ama poco». Y a ella le dijo: «Han quedado perdonados tus pecados».
+            (Lc 7, 36-48)`,
+        `Ya veo en lo que consiste, le dice: tu alma, insensible al dolor, ha aprendido a despreciar los suplicios; y así estimas en nada tu vida; pero puede ser que sientas más la pérdida de tu honor mismo. ¿Esa virginidad, que has consagrado, la darás tan fácilmente como tu vida? Pues sábete que voy a hacerte llevar a un lugar de prostitución, a menos que ahora al punto no humilles tu altanera cabeza ante el altar de nuestros dioses y pidas perdón humildemente a Minerva de haberla despreciado: sábete que es una virgen como tú. Espera pues, servir de placer a una juventud descarada, que se sabe que nada gusta tanto como hallar nuevos objetos a su brutalidad. 
+            No creáis, le respondió Inés, que Jesucristo abandona tan fácilmente a sus esposas. Quiérelas demasiado y las ama con mucha delicadeza para sufrir que se haga perder impunemente su pudor y está siempre pronto a socorrerlas. Él os hace dueño de mi cuerpo, para dividirle en mil pedazos si gustáis; pero no esperéis que os le entregue para que pueda mancharse su pureza.
+            (De la narración poética del martirio de Santa Inés)`,
+        `Sucedió que, mientras aguardaban ellos el día conveniente, salió ella como los tres días anteriores sola con dos criadas, y tuvo ganas de bañarse en el jardín, porque hacía mucho calor. No había allí nadie, excepto los dos ancianos escondidos y acechándola. Susana dijo a las criadas: —Traedme el perfume y las cremas y cerrad la puerta del jardín mientras me baño. Ellas hicieron lo que les dijo, cerraron la puerta del jardín y salieron por una puerta lateral a traer lo que se les había ordenado, y no vieron a los ancianos porque estaban escondidos. Apenas salieron las criadas, se levantaron los dos ancianos, corrieron hacia ella y le dijeron: —Las puertas del jardín están cerradas, nadie nos ve, y nosotros sentimos deseos de ti; así que consiente y acuéstate con nosotros. Si no, daremos testimonio contra ti diciendo que un joven estaba contigo y que por eso habías despachado a las criadas. Susana lanzó un gemido y dijo: —No tengo salida: si hago eso, mereceré la muerte; si no lo hago, no escaparé de vuestras manos. Pero prefiero no hacerlo y caer en vuestras manos antes que pecar delante del Señor.
+            (Dn 13, 15-23)`,
+        `Los escribas y los fariseos le traen una mujer sorprendida en adulterio, y, colocándola en medio, le dijeron: «Maestro, esta mujer ha sido sorprendida en flagrante adulterio. La ley de Moisés nos manda apedrear a las adúlteras; tú, ¿qué dices?». Le preguntaban esto para comprometerlo y poder acusarlo. Pero Jesús, inclinándose, escribía con el dedo en el suelo. Como insistían en preguntarle, se incorporó y les dijo: «El que esté sin pecado, que le tire la primera piedra». E inclinándose otra vez, siguió escribiendo. Ellos, al oírlo, se fueron escabullendo uno a uno, empezando por los más viejos. Y quedó solo Jesús, con la mujer en medio, que seguía allí delante. Jesús se incorporó y le preguntó: «Mujer, ¿dónde están tus acusadores?; ¿ninguno te ha condenado?». Ella contestó: «Ninguno, Señor». Jesús dijo: «Tampoco yo te condeno. Anda, y en adelante no peques más». 
+            (Jn 8, 3-11)`,
+        `Margarita había vivido varios años en concubinato público y tras la muerte de su amante, Dios tocó su corazón con la conversión. Margarita empezó así una vida de penitencia, oración y caridad, incorporándose a la Tercera Orden Franciscana, y Dios empezó a bendecirla con dones místicos. Cierto día, Cristo le preguntó "¿Quieres que te enseñe el lugar que tengo reservado en el Cielo para ti?" a lo que Margarita asintió con gran alegría. Entonces, Jesús le mostró el Coro de las Vírgenes, aquellas que se habían reservado para su Esposo. Acabada la visión, Margarita se entristeció y le dijo a Jesús "Jesús mío, te has debido equivocar, me has enseñado el Coro de las Vírgenes, y tú me conoces: yo no soy virgen". A lo que Jesús respondió "Eres tú quien se equivoca, mi querida hija y esposa, pues tú eres virgen. Yo hoy te hago virgen de nuevo"
             (Redacción novelada de la vida de Santa Margarita de Cortona)`,
-        },
-        {
-            tipo: "texto",
-            texto: `Señor, que te compadeciste de Margarita y le regalaste el ser virgen de nuevo. Apiádate de mí y sana las heridas del pecado, devuélveme la alegría de tu salvación. Lávame, quedaré límpio, rocíame con el hisopo, quedaré más blanco que la nieve`,
-        }
-    ]
-  },
-  {
-    dia: 7,
-    contenido: [
-        {
-            tipo: "texto",
-            texto: `Día 7 - Tobías y Sarra
-            Cuando todos hubieron salido y cerrado la puerta de la habitación, Tobías se levantó de la cama y dijo a Sara: «Levántate, mujer. Vamos a rezar pidiendo a nuestro Señor que se apiade de nosotros y nos proteja». Ella se levantó, y comenzaron a suplicar la protección del Señor. Tobías oró así: 
+        `Cuando todos hubieron salido y cerrado la puerta de la habitación, Tobías se levantó de la cama y dijo a Sara: «Levántate, mujer. Vamos a rezar pidiendo a nuestro Señor que se apiade de nosotros y nos proteja». Ella se levantó, y comenzaron a suplicar la protección del Señor. Tobías oró así: 
             «Bendito seas, Dios de nuestros padres, 
             y bendito tu nombre por siempre. 
             Que por siempre te alaben cielos y todas tus criaturas. 
@@ -1466,46 +1006,37 @@ const novenaCastidad = [
             y haz que lleguemos juntos a la vejez».
             Los dos dijeron: «Amén, amén». 
             (Tb 8, 4-8)`,
-        },
-        {
-            tipo: "texto",
-            texto: `Señor, que nos regalas la sexualidad como algo bueno para colaborar contigo en la creación del mundo, no permitas que mi concupiscencia y malos deseos empañe este regalo que tú me has dado, antes bien, hazme libre para poder servirte con todo mi ser, también con mi sexualidad`,
-        }
+        `Todo me es lícito, pero no todo me aprovecha. Todo me es lícito, pero no me dejaré dominar por nada. (...) El cuerpo no es para la fornicación, sino para el Señor; y el Señor, para el cuerpo. Y Dios resucitó al Señor y nos resucitará también a nosotros con su poder. ¿No sabéis que vuestros cuerpos son miembros de Cristo? ¿Y voy a tomar los miembros de Cristo para hacerlos miembros de una prostituta? ¡De ningún modo! ¿O no sabéis que unirse a una prostituta es hacerse un cuerpo con ella? Porque dice: «Serán los dos una sola carne». En cambio, el que se une al Señor es un espíritu con él. Huid de la inmoralidad. Cualquier pecado que cometa el hombre queda fuera de su cuerpo. Pero el que fornica peca contra su propio cuerpo. ¿Acaso no sabéis que vuestro cuerpo es templo del Espíritu Santo, que habita en vosotros y habéis recibido de Dios? Y no os pertenecéis, pues habéis sido comprados a buen precio. Por tanto, ¡glorificad a Dios con vuestro cuerpo!
+            (1 Co 6, 12-20)`,
+        `“La virtud de la castidad no es cuestión de ascética sino de fe.”
+            “En la virginidad es todo gracia, don, que no nace del moralismo sino del mismo Dios.”
+            “Dios llama… a la virginidad, porque es un signo escatológico del futuro”`,
     ]
-  },
-  {
-    dia: 8,
-    contenido: [
-        {
-            tipo: "texto",
-            texto: `Día 8 - San Pablo
-                Todo me es lícito, pero no todo me aprovecha. Todo me es lícito, pero no me dejaré dominar por nada. (...) El cuerpo no es para la fornicación, sino para el Señor; y el Señor, para el cuerpo. Y Dios resucitó al Señor y nos resucitará también a nosotros con su poder. ¿No sabéis que vuestros cuerpos son miembros de Cristo? ¿Y voy a tomar los miembros de Cristo para hacerlos miembros de una prostituta? ¡De ningún modo! ¿O no sabéis que unirse a una prostituta es hacerse un cuerpo con ella? Porque dice: «Serán los dos una sola carne». En cambio, el que se une al Señor es un espíritu con él. Huid de la inmoralidad. Cualquier pecado que cometa el hombre queda fuera de su cuerpo. Pero el que fornica peca contra su propio cuerpo. ¿Acaso no sabéis que vuestro cuerpo es templo del Espíritu Santo, que habita en vosotros y habéis recibido de Dios? Y no os pertenecéis, pues habéis sido comprados a buen precio. Por tanto, ¡glorificad a Dios con vuestro cuerpo!
-                (1 Co 6, 12-20)`,
-        },
-        {
-            tipo: "texto",
-            texto: `Señor, que te has hecho un solo cuerpo conmigo en la eucaristía y has hecho de mi cuerpo templo de tu Espíritu: No permitas que mancille lo que Tú has comprado con tu preciosa sangre, antes bien, hazme respetar la dignidad de lo que Tú has dignificado`,
-        }
-    ]
-  },
-  {
-    dia: 9,
-    contenido: [
-        {
-            tipo: "texto",
-            texto: `Día 9
-                “La virtud de la castidad no es cuestión de ascética sino de fe.”
-                “En la virginidad es todo gracia, don, que no nace del moralismo sino del mismo Dios.”
-                “Dios llama… a la virginidad, porque es un signo escatológico del futuro”
-                (Carmen Hernández, Corazón Indiviso)`,
-        },
-        {
-            tipo: "texto",
-            texto: `Señor, que nos regalas las castidad como símbolo escatológico desde tu Gracia en respuesta a nuestra fe y no a nuestros méritos: Regálame también a mí la Gracia de la Castidad, que te suplico en esta novena, de modo que con un corazón indiviso te ama con todos tus santos y goce de Ti en el Reino de los cielos. Amén`,
-        }
-    ]
-  }
-];
+    const tituloDiasCastidad = [
+        "José de Egipto",
+        "La publicana",
+        "Santa Inés",
+        "Susana",
+        "La adúltera",
+        "Santa Margarita de Cortona",
+        "Tobías y Sarra",
+        "San Pablo",
+        "Carmen Hernández, Corazón Indiviso"
+    ];
+    const meditacionDiasCastidad = [
+        "Señor, que enseñaste a José a escapar de la tentación sin importarle las apariencias, concédeme el don de prudencia para huir de la ocasión de pecar, no por fidelidad a los hombres, sino por fidelidad a Ti, el único y buen Señor",
+        "Señor, que no te escandalizas de los pecados de la publicana sino que los perdonas. Dame la gracia de llorar mis pecados y regar con mis lágrimas tus pies, para que habiendo sido perdonado mucho, ame mucho y comenzando una nueva vida pueda amarte, bendecirte y alabarte con todos tus santos",
+        "Señor, que hiciste comprender a Santa Inés que su pureza era más valiosa que su vida y que la dignidad de su carne importaba más que la integridad, concédeme defender mi castidad como a mí mismo, entendiendo que una sexualidad al servicio de Satanás y sus ángeles es mucho peor que la propia muerte",
+        "Señor, que en la historia de Susana nos enseñaste que es mejor ser difamado entre los hombres que pecar ante ti, ayúdame a que no me importe mi imagen, lo que los demás piensen de mí, incluso las difamaciones o desamores; que esté dispuesto a perderlo todo para permanecer puro ante ti",
+        "Señor, que no condenaste a la adúltera sino que la levantaste de sus pecados, perdóname también a mí mis caídas y consuela a mi alma con esas palabras tuyas «y en adelante no peques más»",
+        "Señor, que te compadeciste de Margarita y le regalaste el ser virgen de nuevo. Apiádate de mí y sana las heridas del pecado, devuélveme la alegría de tu salvación. Lávame, quedaré limpio, rocíame con el hisopo, quedaré más blanco que la nieve",
+        "Señor, que nos regalas la sexualidad como algo bueno para colaborar contigo en la creación del mundo, no permitas que mi concupiscencia y malos deseos empañen este regalo que tú me has dado, antes bien, hazme libre para poder servirte con todo mi ser, también con mi sexualidad",
+        "Señor, que te has hecho un solo cuerpo conmigo en la eucaristía y has hecho de mi cuerpo templo de tu Espíritu: No permitas que mancille lo que Tú has comprado con tu preciosa sangre, antes bien, hazme respetar la dignidad de lo que Tú has dignificado",
+        "Señor, que nos regalas la castidad como símbolo escatológico desde tu Gracia en respuesta a nuestra fe y no a nuestros méritos: Regálame también a mí la Gracia de la Castidad, que te suplico en esta novena, de modo que con un corazón indiviso te ame con todos tus santos y goce de Ti en el Reino de los cielos. Amén",
+    ];
+
+    const novenaCastidad = crearDiasNovena(lecturaDiasCastidad, meditacionDiasCastidad, null, null, tituloDiasCastidad);
+
 // Novena del Perdon
 const coronillaPerdon = [
     // INICIO
@@ -1523,167 +1054,714 @@ const coronillaPerdon = [
     // FINAL
     SantoDios
 ];
-const novenaPerdon = [
-    {
-    dia: 1,
-    contenido: [
-        {
-            tipo: "texto",
-            texto: `1º Mandamiento - Amarás a Dios sobre todas las cosas
-                Sin embargo, todo eso que para mí era ganancia, lo consideré pérdida a causa de Cristo. Más aún: todo lo considero pérdida comparado con la excelencia del conocimiento de Cristo Jesús, mi Señor. Por él lo perdí todo, y todo lo considero basura con tal de ganar a Cristo y ser hallado en él, no con una justicia mía, la de la ley, sino con la que viene de la fe de Cristo, la justicia que viene de Dios y se apoya en la fe. Todo para conocerlo a él, y la fuerza de su resurrección, y la comunión con sus padecimientos, muriendo su misma muerte, con la esperanza de llegar a la resurrección de entre los muertos. No es que ya lo haya conseguido o que ya sea perfecto: yo lo persigo, a ver si lo alcanzo como yo he sido alcanzado por Cristo. Hermanos, yo no pienso haber conseguido el premio. Solo busco una cosa: olvidándome de lo que queda atrás y lanzándome hacia lo que está por delante, corro hacia la meta, hacia el premio, al cual me llama Dios desde arriba en Cristo Jesús`,
-        },
-        {
-            tipo: "texto",
-            texto: `Señor, tú nos has dicho que no se puede servir a dos señores, porque amando a uno despreciamos al otro... ciertamente no podemos amarte a Ti y al mundo. Pablo considera pérdida todo lo que no es Cristo, todos sus logros y afanes pasados. Todo es basura en comparación de ganar a Cristo. Esto es amarte sobre todas las cosas, olvidarme de mis éxitos, de mis afectos, de mis comodidades... olvidarme del mundo y amarte solo a Ti. Y entonces se es libre: libre para seguirte, libre para anunciarte, libre de mí mismo, libre del pecado. Libre como los hijos de Dios. Perdóname porque ciertamente no te amo sobre todas las cosas. Amo demasiado el mundo, me seduce e intento ir a dos aguas. Santa Teresa hablaba de los duro de ese combate entre Dios y el mundo. También yo estoy harto de este combate: ¡Todo tuyo! ¡Amarte sobre todas las cosas! Perdóname, Padre mío, por todas las veces que no lo he cumplido y dame un corazón como el de Cristo, capaz al menos de cumplir el primer mandamiento: Amarás al Señor sobre todas las cosas`,
-        }
+// Creando mapas para la novena del perdón
+    const lecturaDiasPerdon = [
+        `Sin embargo, todo eso que para mí era ganancia, lo consideré pérdida a causa de Cristo. Más aún: todo lo considero pérdida comparado con la excelencia del conocimiento de Cristo Jesús, mi Señor. Por él lo perdí todo, y todo lo considero basura con tal de ganar a Cristo y ser hallado en él, no con una justicia mía, la de la ley, sino con la que viene de la fe de Cristo, la justicia que viene de Dios y se apoya en la fe. Todo para conocerlo a él, y la fuerza de su resurrección, y la comunión con sus padecimientos, muriendo su misma muerte, con la esperanza de llegar a la resurrección de entre los muertos. No es que ya lo haya conseguido o que ya sea perfecto: yo lo persigo, a ver si lo alcanzo como yo he sido alcanzado por Cristo. Hermanos, yo no pienso haber conseguido el premio. Solo busco una cosa: olvidándome de lo que queda atrás y lanzándome hacia lo que está por delante, corro hacia la meta, hacia el premio, al cual me llama Dios desde arriba en Cristo Jesús
+            (Flp 3, 7-14)`,
+        `Tened entre vosotros los sentimientos propios de Cristo Jesús. 
+            El cual, siendo de condición divina, 
+            no retuvo ávidamente el ser igual a Dios; 
+            al contrario, se despojó de sí mismo 
+            tomando la condición de esclavo, 
+            hecho semejante a los hombres. 
+            Y así, reconocido como hombre por su presencia, 
+            se humilló a sí mismo, 
+            hecho obediente hasta la muerte, 
+            y una muerte de cruz. 
+            Por eso Dios lo exaltó sobre todo 
+            y le concedió el Nombre-sobre-todo-nombre; 
+            de modo que al nombre de Jesús 
+            toda rodilla se doble 
+            en el cielo, en la tierra, en el abismo, 
+            y toda lengua proclame: 
+            Jesucristo es Señor, 
+            para gloria de Dios Padre.
+            (Flp 2, 5-11)`,
+        `Recuerda el día del sábado para santificarlo. Durante seis días trabajarás y harás todas tus tareas, pero el día séptimo es día de descanso, consagrado al Señor, tu Dios. No harás trabajo alguno, ni tú, ni tu hijo, ni tu hija, ni tu esclavo, ni tu esclava, ni tu ganado, ni el emigrante que reside en tus ciudades. Porque en seis días hizo el Señor el cielo, la tierra, el mar y lo que hay en ellos; y el séptimo día descansó. Por eso bendijo el Señor el sábado y lo santificó.
+            (Ex 20, 8-11)`,
+        `«Anuláis el mandamiento de Dios por mantener vuestra tradición. Moisés dijo: “Honra a tu padre y a tu madre” y “el que maldiga a su padre o a su madre es reo de muerte”. Pero vosotros decís: “Si uno le dice al padre o a la madre: los bienes con que podría ayudarte son corbán, es decir, ofrenda sagrada”, ya no le permitís hacer nada por su padre o por su madre; invalidando la palabra de Dios con esa tradición que os transmitís; y hacéis otras muchas cosas semejantes»
+            (Mc 7, 9-13)`,
+        `Habéis oído que se dijo a los antiguos: “No matarás”, y el que mate será reo de juicio. Pero yo os digo: todo el que se deja llevar de la cólera contra su hermano será procesado. Y si uno llama a su hermano “imbécil”, tendrá que comparecer ante el Sanedrín, y si lo llama “necio”, merece la condena de la gehenna del fuego. Por tanto, si cuando vas a presentar tu ofrenda sobre el altar, te acuerdas allí mismo de que tu hermano tiene quejas contra ti, deja allí tu ofrenda ante el altar y vete primero a reconciliarte con tu hermano, y entonces vuelve a presentar tu ofrenda. Con el que te pone pleito procura arreglarte enseguida, mientras vais todavía de camino, no sea que te entregue al juez y el juez al alguacil, y te metan en la cárcel. En verdad te digo que no saldrás de allí hasta que hayas pagado el último céntimo.
+            (Mt 5, 21-26)`,
+        `Buscar texto`,
+        `Buscar texto`,
+        `Buscar texto`,
+        `Buscar texto`,
+        `Buscar texto`,
     ]
-  },
-  {
-    dia: 2,
-    contenido: [
-        {
-            tipo: "texto",
-            texto: `2º Mandamiento - No tomarás el nombre de Dios en vano
-                Tened entre vosotros los sentimientos propios de Cristo Jesús. 
-                El cual, siendo de condición divina, 
-                no retuvo ávidamente el ser igual a Dios; 
-                al contrario, se despojó de sí mismo 
-                tomando la condición de esclavo, 
-                hecho semejante a los hombres. 
-                Y así, reconocido como hombre por su presencia, 
-                se humilló a sí mismo, 
-                hecho obediente hasta la muerte, 
-                y una muerte de cruz. 
-                Por eso Dios lo exaltó sobre todo 
-                y le concedió el Nombre-sobre-todo-nombre; 
-                de modo que al nombre de Jesús 
-                toda rodilla se doble 
-                en el cielo, en la tierra, en el abismo, 
-                y toda lengua proclame: 
-                Jesucristo es Señor, 
-                para gloria de Dios Padre.`,
-        },
-        {
-            tipo: "texto",
-            texto: `No tomarás el nombre de Dios en vano. No solamente es no jurar, o no blasfemar (de lo que rebosa el corazón hablara la boca ¡Qué debe haber en el corazón del pobre blasfemo!). No tomar el nombre de Dios en vano es ante todo bendecir este Nombre-sobre-todo-nombre. Yo soy cristiano, llevo el nombre de Cristo, cada vez que como cristiano vivo como escándalo estoy mancillando el nombre de Cristo, tomándolo en vano en mi propia carne. Perdóname Señor por todas las veces que tomo tu nombre en vano, que lo mancillo. Bien con mi palabra, bien con mis actos, bien con mis pensamientos. De lo que rebosa el corazón habla la boca, si te amo sobre todas las cosas ¿Cómo mancillar tu nombre? Ayúdame, Amor mío, a glorificar tu nomnbre. ¡Santificado sea tu nombre! Y no solo el tuyo, el de todo lo que te rodea. Ayúdame a respetar y venerar lo sagrado, todo lo que te circunda, y así portar con orgullo sobre mi carne este Nombre-sobre-todo-nombre`,
-        },
-    ]
-   },
-   {
-    dia: 3,
-    contenido: [
-        {
-            tipo: "texto",
-            texto: `3º Mandamiento - Santificarás las fiestas
-                 8Recuerda el día del sábado para santificarlo. 9Durante seis días trabajarás y harás todas tus tareas, 10pero el día séptimo es día de descanso, consagrado al Señor, tu Dios. No harás trabajo alguno, ni tú, ni tu hijo, ni tu hija, ni tu esclavo, ni tu esclava, ni tu ganado, ni el emigrante que reside en tus ciudades. 11Porque en seis días hizo el Señor el cielo, la tierra, el mar y lo que hay en ellos; y el séptimo día descansó. Por eso bendijo el Señor el sábado y lo santificó.`,
-        },
-        {
-            tipo: "texto",
-            texto: `Hacer meditación`,
-        },
-    ]
-  },
-  {
-    dia: 4,
-    contenido: [
-        {
-            tipo: "texto",
-            texto: `4º Mandamiento - Honrarás a tu padre y a tu madre
-                Buscar texto`,
-        },
-        {
-            tipo: "texto",
-            texto: `Hacer meditación`,
-        },
-        ]
-  },
-  {
-    dia: 5,
-    contenido: [
-        {
-            tipo: "texto",
-            texto: `5º Mandamiento - No matarás
-                Buscar texto`,
-        },
-        {
-            tipo: "texto",
-            texto: `Hacer meditación`,
-        },
-    ]
-  },
-  {
-    dia: 6,
-    contenido: [
-        {
-            tipo: "texto",
-            texto: `6º Mandamiento - No cometerás actos impuros
-            Buscar texto`,
-        },
-        {
-            tipo: "texto",
-            texto: `Hacer meditación`,
-        },
-    ]
-  },
-  {
-    dia: 7,
-    contenido: [
-        {
-            tipo: "texto",
-            texto: `7º Mandamiento - No robarás
-            Buscar texto`,
-        },
-        {
-            tipo: "texto",
-            texto: `Hacer meditación`,
-        },
-    ]
-  },
-  {
-    dia: 8,
-    contenido: [
-        {
-            tipo: "texto",
-            texto: `8º Mandamiento - No darás falso testimonio ni mentirás
-                Buscar texto`,
-        },
-        {
-            tipo: "texto",
-            texto: `Hacer meditación`,
-        },
-    ]
-  },
-  {
-    dia: 9,
-    contenido: [
-        {
-            tipo: "texto",
-            texto: `9º Mandamiento - No consentirás pensamientos ni deseos impuros
-                Buscar texto`,
-        },
-        {
-            tipo: "texto",
-            texto: `Hacer meditación`,
-        },
-    ]
-   },
-   {
-    dia: 10,
-    contenido: [
-        {
-            tipo: "texto",
-            texto: `10º Mandamiento - No codiciarás los bienes agenos
-                Buscar texto`,
-        },
-        {
-            tipo: "texto",
-            texto: `Hacer meditación`,
-        },
-    ]
-    },
-]
+    
+    const tituloDiasPerdon = [
+        "1º Mandamiento - Amarás a Dios sobre todas las cosas",
+        "2º Mandamiento - No tomarás el nombre de Dios en vano",
+        "3º Mandamiento - Santificarás las fiestas",
+        "4º Mandamiento - Honrarás a tu padre y a tu madre",
+        "5º Mandamiento - No matarás",
+        "6º Mandamiento - No cometerás actos impuros",
+        "7º Mandamiento - No robarás",
+        "8º Mandamiento - No darás falso testimonio ni mentirás",
+        "9º Mandamiento - No consentirás pensamientos ni deseos impuros",
+        "10º Mandamiento - No codiciarás los bienes ajenos"
+    ];
 
-//Agrupación del contenido de las novenas
+    const meditacionDiasPerdon = [
+        `Señor, tú nos has dicho que no se puede servir a dos señores, porque amando a uno despreciamos al otro... ciertamente no podemos amarte a Ti y al mundo. Pablo considera pérdida todo lo que no es Cristo, todos sus logros y afanes pasados. Todo es basura en comparación de ganar a Cristo. 
+        Esto es amarte sobre todas las cosas, olvidarme de mis éxitos, de mis afectos, de mis comodidades... olvidarme del mundo y amarte solo a Ti. Y entonces se es libre: libre para seguirte, libre para anunciarte, libre de mí mismo, libre del pecado. Libre como los hijos de Dios. Perdóname porque ciertamente no te amo sobre todas las cosas. Amo demasiado el mundo, me seduce e intento ir a dos aguas. Santa Teresa hablaba de lo duro de ese combate entre Dios y el mundo. También yo estoy harto de este combate: ¡Todo tuyo! ¡Amarte sobre todas las cosas! Perdóname, Padre mío, por todas las veces que no lo he cumplido y dame un corazón como el de Cristo, capaz al menos de cumplir el primer mandamiento: Amarás al Señor sobre todas las cosas`,
+        `No tomarás el nombre de Dios en vano. No solamente es no jurar, o no blasfemar (de lo que rebosa el corazón habla la boca ¡Qué debe haber en el corazón del pobre blasfemo!) No tomar el nombre de Dios en vano es ante todo bendecir este Nombre-sobre-todo-nombre. Yo soy cristiano, llevo el nombre de Cristo, cada vez que como cristiano soy un escándalo, estoy mancillando el nombre de Cristo, tomándolo en vano en mi propia carne. 
+        Perdóname Señor por todas las veces que tomo tu nombre en vano, que lo mancillo. Bien con mi palabra, bien con mis actos, bien con mis pensamientos. De lo que rebosa el corazón habla la boca, si te amo sobre todas las cosas ¿Cómo mancillar tu nombre? 
+        Ayúdame, Amor mío, a glorificar tu nombre. ¡Santificado sea tu nombre! Y no solo el tuyo, el de todo lo que te rodea. Ayúdame a respetar y venerar lo sagrado, todo lo que te circunda, y así portar con orgullo sobre mi carne este Nombre-sobre-todo-nombre`,
+        `Santificar las fiestas. Las fiestas deben ser santificadas, es día de gozo y alegría, día de reposo y de santidad, que Dios ha dado a su pueblo. En las fiestas no se trabaja, no se estudia, no se pelea, no se discute... Las fiestas se santifican. Son días de vestir bien, comer bien, disfrutar en el Señor, lejos del pecado y lejos del amor al mundo, conscientes de que la vida nos la da Dios y que solo en Él tiene plenitud. Los domingos y las fiestas del Señor son días que nos deben recordar que Cristo ha resucitado y que estamos llamados a la vida eterna, no a este mundo. Santificar las fiestas es vivirlas de modo distinto al resto de días, celebrando que, aunque aún no se ha consumado del todo, Cristo ya ha vencido. 
+        Padre Bueno, ¡Ayúdame a Santificar las fiestas! Ayúdame a fiarme de ti, a abandonar mis afanes del mundo y a celebrar tu victoria, tuya entera.`,
+        `Honrar al padre y a la madre... amar al padre y a la madre. Honrar a los padres es amarlos, respetarlos, obedecerlos, cuidar de ellos. Hasta el punto que Cristo mismo pone la honra al padre y a la madre por encima del corbán, de la ofrenda al templo. Honrar a los padres es honrar a Dios que nos los ha dado. Nuestros padres nos han dado su tiempo, su dinero, su esfuerzo, su amor, han sido pacientes cuando hemos sido torpes, incapaces, débiles... Nuestra respuesta debe ser la misma. Difícilmente se amará y honrará a Dios Padre si no amamos y honramos a nuestro padre de la tierra. Y esto incluye a quien ha tenido malos padres en la tierra, en el eclesiástico, el honrar del hijo al padre precede al tratar bien del padre al hijo. Es imposible amar a Dios para quien odia a su padre. Así pues, que el amor y honra del PADRE nos enseñe a amar y honrar al padre. 
+        Perdóname Señor por todas las veces que he despreciado a mis padres, he desobedecido sus consejos, he sido impaciente, no les he cuidado, les he dejado de lado. Ayúdame a honrarlos y amarlos viendo en ellos el reflejo de tu Padre. Ayúdame a pedirles perdón por cada vez que no les he honrado y dame el pleno amor a ellos.`,
+        `Mira que este mandamiento parecía fácil... y ahora, tras las palabras de Cristo, se antoja nuevo. No matarás resulta que deviene en "amarás". Quien juzga a su hermano, le mata. Quien reniega de su hermano, le mata. Quien odia a su hermano, le mata... En definitiva, quien no ama a su hermano, le mata. Por eso es tan importante la reconciliación, el perdón, la restitución de los males cometidos. Si has matado a tu hermano, devuélvele a la vida.
+        Señor mío, perdóname por todas las veces que he matado a mi hermano. Perdóname por las veces que odio, que juzgo, que insulto, desprecio, calumnio, envidio... perdóname cada vez que no amo al prójimo, porque si no amo al prójimo, soy un asesino. Resucita a mis hermanos, resucítame a mí. Danos la reconciliación para que cuando venga el justo juez nos encuentre en paz.`,
+        `Hacer meditación`,
+        `Hacer meditación`,
+        `Hacer meditación`,
+        `Hacer meditación`,
+        `Hacer meditación`,        
+    ]
+        
+    const novenaPerdon = crearDiasNovena(lecturaDiasPerdon, meditacionDiasPerdon, SEÑOR_MIO, Salmo50, tituloDiasPerdon);
+
+// Novena del Padre Pío
+// Creando mapas para la novena del Padre Pío
+    const lecturaDiasPadrePio = [
+        `Oh glorioso y santo Padre Pío, 
+            estamos a tus pies, vuelve a nosotros tu mirada. 
+            
+            Somos tus devotos; hemos admirado tu vida, seguido tus pasos 
+            y experimentado el poder de tu intercesión. 
+            
+            Durante tu vida en esta tierra, 
+            una multitud de gente llegaba cada día a San Giovanni Rotondo 
+            para verte, contemplar tu fe, 
+            recibir el perdón a través de tu palabra, 
+            escuchar tus enseñanzas y pedir tu intercesión. 
+            
+            Con ese mismo amor, 
+            y conscientes del maravilloso poder que tiene ante Dios tu oración, 
+            venimos hoy a tus pies.`,
+        `Oh glorioso Padre Pío, 
+            desde niño te ofreciste a Dios como instrumento de reparación. 
+            
+            Tu familia era pobre y en ella comenzaste a crecer 
+            en edad, en sabiduría y en bondad. 
+            
+            Tu padre, soñando un futuro mejor, viajó a Argentina 
+            y tú, que dijiste un día: 
+            
+            “Mi padre se marchó 
+            lejos de su mujer y de sus hijos 
+            para conseguir para todos algo que comer”, 
+            
+            Reconociste la valentía de este gesto. 
+            
+            Tu madre, ayudada por sus hijos, 
+            se dedicaba por entero al trabajo de los campos 
+            para que nada os faltara. 
+            
+            Tenemos el testimonio que tú mismo nos has dejado 
+            y que nos sirve de enseñanza:
+            
+            “Desde la más tierna infancia 
+            trabajamos con empeño... 
+            El pan sabía a trabajo... 
+            Amábamos a nuestros padres... 
+            Junto a ella luchábamos la gran batalla de la vida...”.`,
+        `Oh santo Padre Pío, 
+            tú creciste en una familia profundamente religiosa. 
+            
+            Fue tu padre el que un día te llamó junto a sí y te hizo esta importante pregunta:
+            
+            “Hijo mío, ¿no te gustaría ser religioso o sacerdote?”.
+            
+            Leyendo las entrevistas que se hacen a niños y jóvenes sobre su futuro, 
+            vemos que no toman en consideración la posibilidad de una vida consagrada.
+            
+            Si les preguntamos qué quieren ser de mayores, 
+            responden que quieren ser militares, médicos, sastres o ingenieros, 
+            y la vida religiosa no está entre sus proyectos. ¿Por qué? 
+            
+            Sin embargo, el honor más grande que puede recibir una familia 
+            es el de tener un hijo a quien Dios ha elegido para consagrarlo para Sí 
+            como religioso o como sacerdote.`,    
+        `Oh Santo Padre Pío, 
+            en el convento iniciaste una vida nueva, 
+            consciente de todas sus consecuencias. 
+            
+            Lo dijiste tú mismo: 
+            
+            “Tenía sólo 16 años 
+            pero sabía bien lo que tenía que dejar de lado 
+            si quería ser un buen religioso... 
+            
+            Tenía que dedicarme a conocer mejor las exigencias del estado de vida 
+            que voluntariamente había elegido 
+            y dejarme compenetrar por la filosofía y la teología. 
+            
+            Me esperaba una vida de comunidad, 
+            que me pedía un fuerte enriquecimiento espiritual...”. 
+            
+            Nadie te había engañado. 
+            Tu madre, al dejarte marchar al convento, te había dicho: 
+            
+            “Has querido que te acompañe hasta la puerta de tu nueva casa. 
+            
+            Ahora, con tus hermanos, vuelve a tu trabajo de siempre. 
+            
+            Recuérdame en tus oraciones y no olvides nunca que eres, ante todo, 
+            hijo de Dios y de san Francisco. 
+            
+            Haz cuando te pidan, 
+            porque no tiene sentido alejarse de tus seres queridos 
+            si no te da alegría de haber encontrado el verdadero camino de la vida...”. 
+            
+            Y así comenzó tu vida como religioso.`,
+        `Oh santo Padre Pío, 
+            tu vida fue sencilla y nada fácil. 
+            
+            Fuiste probado con sufrimientos y tentaciones, 
+            y el dolor hizo de tu corazón un sarmiento podado. 
+            
+            Evitaste siempre que tu sufrimiento apareciese al exterior 
+            y preferiste sufrir y permanecer en silencio. 
+            
+            No te importaba verte herido porque sabías que era Dios el que te hería. 
+            
+            Sabías bien que aceptar el sufrimiento 
+            no significaba ni complacerte en él ni amarlo en sí mismo, 
+            sino, más bien, aceptarlo para que él te hiciera humilde, 
+            del mismo modo que la tierra deja que el agua del cielo penetre hasta dentro. 
+            
+            Así actuaste tú, Padre Pío, 
+            y fuiste capaz de ocultar tus sufrimientos 
+            con las rosas de la aceptación serena.`,
+        `Oh santo Padre Pío, 
+            desde niño te ofreciste como víctima por los demás. 
+            
+            Dios aceptó tu deseo y allí, en San Giovanni Rotondo, 
+            te transformó en “otro Cristo” sufriente. 
+            
+            Tú nos has hablado de tus luchas interiores:
+        
+            “¿Quién llegará a comprender el martirio que sufría en mi interior? 
+            
+            El solo recuerdo de aquellas luchas íntimas me congela la sangre en las venas. 
+            
+            Escuchaba la voz que me llamaba a obedecerte, Dios mío, 
+            pero tus enemigos me tiranizaban, 
+            me dislocaban los huesos y me retorcían las entrañas...”. 
+            
+            Un día aparecieron en tu cuerpo las llagas. 
+            
+            Habías deseado ser víctima por todos, 
+            por aquellos que se encomendaban a ti y por los que no lo hacían, 
+            por los justos y por los pecadores. 
+            
+            Al licenciarte del servicio militar, 
+            que te permitió conocer tanto mal, 
+            te ofreciste por la Iglesia 
+            y pediste a Dios que descargara sobre ti su justicia 
+            y una misión propiciatoria: 
+            quisiste cargar sobre ti el castigo de todos los pecados de los demás.`,
+        `Oh Santo Padre Pío, 
+            hombre de fe y de oración 
+            las multitudes de ayer y de hoy van a ti; ¿por qué? 
+            Ellas ven en ti un hombre de Dios, 
+            un hombre de fe, un hombre hecho oración,
+            un hombre de sufrimiento, un crucificado sin cruz...; 
+            y permanecen mudos al contemplar tu transcurrir de horas y horas en el coro, 
+            ante la cruz y a los pies de Nuestra Señora de las Gracias. 
+
+            Un día te preguntaron qué eras tú para todos aquellos que venían a ti, 
+            y tú dijiste de ti mismo: 
+            
+            “Entre vosotros soy un ser humano, 
+            en el altar una víctima, 
+            en el confesonario un juez”. 
+            
+            Tu misa era algo maravilloso. 
+            La gente se agolpaba en torno al altar 
+            y, viéndote transfigurado por el amor y por el dolor, 
+            creía y oraba.
+
+            En la intensidad del fervor, 
+            todo proclamaba que vivías la pasión de Cristo 
+            y que te inmolabas con Él. 
+            
+            El Papa Pablo VI lo reconoció con estas palabras: 
+            
+            “¡Mirad qué fama y qué clientela mundial ha reunido en torno a sí! 
+            ¿Por qué? Porque celebraba la Misa humildemente, 
+            confesaba de la mañana a la noche y era un hombre de oración”`,
+        `Oh santo Padre Pío, 
+            el dolor es para el cristiano una prueba, 
+            una exigencia de la fe y un mal. 
+            
+            Dios te eligió como víctima 
+            y tú hiciste de tu vida una inmolación y una ofrenda de amor. 
+            Tú te ofreciste a Dios para que otros tuviesen la Vida.
+
+            Cuando pensamos en los otros es cuando comenzamos a ser cristianos.
+
+            Tu amor te llevaba a hacer presente a Dios entre los hombres, 
+            y proclamaste de este modo tu entrega a Él: 
+            
+            “Tenemos que amar a los demás porque son imagen visible de Dios, 
+            y amarlos como Dios los ama... 
+            Si Dios nos ha llenado de dones 
+            y nos ha dado la voluntad, 
+            no podemos encerrar todo esto en un baúl 
+            y no dejar que dé el fruto que debe producir”. 
+            
+            Tu amor a Dios y al hombre te llevó a sufrir con los que sufren. 
+            
+            Era imposible eliminar el sufrimiento, 
+            pero tú viste que podías aliviarlo 
+            y te sentiste urgido a hacerlo. 
+            
+            Fue así como nacieron las grandes iniciativas 
+            para aliviar el sufrimiento.`,
+        `Oh Santo Padre Pío, 
+            crucificado sin cruz; 
+            tu existencia estuvo marcada por lo sobrenatural 
+            y por lo humanamente inexplicable. 
+            
+            Toda tu vida fue una entrega total a Dios y a los hermanos 
+            y, como Cristo, pasaste haciendo el bien. 
+            
+            Las multitudes corrían a ti, 
+            a tus Misas, a tu confesonario, 
+            a tus bendiciones, a tus prácticas de devoción de la tarde... 
+            y regresaban confortadas y contentas. 
+            
+            Hoy continúas siendo nuestro protector ante Dios; 
+            y, cada año, millones de personas visitan tu tumba 
+            para pedir gracias y para agradecer 
+            los milagros que saben han recibido por tu intercesión.`,
+    ]
+    const meditacionDiasPadrePio = [
+        `Ruega por nosotros. Nos encomendamos a ti con la certeza de que nos obtendrás de Dios las gracias que necesitamos. Las pedimos también nosotros al Dador de todo bien, por Jesucristo nuestro Señor. Amén. 
+            
+            Para que conceda al mundo y a la Iglesia padres responsables y fieles a la misión que se les ha confiado, Roguemos al Señor.
+            Para que en las familias se cultive el cuidado de la salud, tanto corporal como espiritual, de cada uno de sus miembros, Roguemos al Señor.`, 
+        `Haz que el Señor nos conceda también a nosotros hijos así: entregados al trabajo, afectuosos, integrados en la familia. Lo pedimos también nosotros al Dador de todo bien, por Jesucristo nuestro Señor. Amén.
+            
+            Para que las familias sean para los niños escuela e iglesia, Roguemos al Señor.
+            Para que los niños crezcan agradeciendo el amor y la entrega de sus padres, Roguemos al Señor.
+            Para que en las familias brille el amor mutuo y se ore a Dios, sabiendo que la familia que reza unida permanece unida. Roguemos al Señor.`,
+        `Pedimos tu protección para que en la Iglesia surjan abundantes vocaciones y haya siempre muchos santos y religiosos. Lo pedimos también nosotros al Dador de todo bien, por Jesucristo nuestro Señor. Amén. 
+        
+            Para que todos los servicios que prestamos manifiesten nuestra fe en el Evangelio, Roguemos al Señor.
+            Para que sepamos estar cerca de nuestros hermanos pobres y necesitados, Roguemos al Señor.
+            Para que vivamos en actitud de servicio y evangelicemos con el ejemplo y con la palabra, Roguemos al Señor.`,
+        `Intercede ante el Señor para que la Iglesia tenga almas generosas, capaces de dejarlo todo para seguir a Cristo. Lo pedimos también nosotros al Dador de todo bien, por Jesucristo nuestro Señor. Amén.
+            
+            Para que todos los sacerdotes se sepan y sean testigos de la fe en medio de los hombres, Roguemos al Señor.
+            Para que todos los sacerdotes se mantengan en comunión con el Papa y con los Obispos, Roguemos al Señor.
+            Para que en todo momento ofrezcamos nuestro testimonio de vida fraterna y profética, Roguemos al Señor.`,
+        `Enséñanos la actitud auténtica del cristiano ante el dolor, y ayúdanos a dejarle que realice su acción purificadora y misionera. Lo pedimos también nosotros al Dador de todo bien, por Jesucristo nuestro Señor. Amén.
+        
+            Para que sepamos dar al sufrimiento el sentido cristiano que tiene, Roguemos al Señor.
+            Para que sepamos aceptar con espíritu de fe nuestras enfermedades y las de nuestros hermanos, Roguemos al Señor.
+            Para que sepamos ver el sufrimiento como medio de purificación y de apostolado, Roguemos al Señor.`,
+        `Alcánzanos de Dios la gracia de aceptar los sufrimientos y hacer de ellos una ofrenda de amor. La pedimos también nosotros al Dador de todo bien, por Jesucristo nuestro Señor. Amén.
+        
+            Para que el sufrimiento nos lleve a la unión con Cristo, Roguemos al Señor.
+            Para que nos conceda comprender la fuerza transformadora del dolor aceptado, Roguemos al Señor.
+            Para que nos enseñe a aceptar y a ofrecer los sufrimientos, Roguemos al Señor.`,
+        `Queridísimo Padre Pío, intercede por nosotros ante el Señor para que vivamos nuestra fe como la viviste tú, hagamos de la Misa la fuente y la meta de nuestro fervor, y nuestra vida transcurra en una constante y viva comunión con Él. Se lo pedimos también nosotros, por Jesucristo nuestro Señor.
+        
+            Para que la Misa y la Eucaristía sean fuente y meta de nuestra fe, Roguemos al Señor.
+            Para que, siguiendo el ejemplo del Padre Pío, vivamos en comunión permanente con Dios, Roguemos al Señor.
+            Para que aceptemos con valentía las adversidades que ponen a prueba nuestra fe, Roguemos al Señor.`,
+        `Queremos aprender de ésta tu gran sensibilidad. Que nunca pasemos indiferentes ante el hermano que sufre. Lo pedimos también nosotros al Dador de todo bien, por Jesucristo nuestro Señor. Amén.
+        
+            Para que los ancianos y los enfermos reciban de nosotros el afecto que merecen, Roguemos al Señor.
+            Para que manifestemos con obra de caridad hacia el prójimo el amor que tenemos a Dios, Roguemos al Señor.
+            Para que sepamos avivar la esperanza en los enfermos y busquemos el bien de los que sufren, Roguemos al Señor.`,
+        `Querido Padre Pío, con gran confianza hemos vuelto a ti para pedir tu intercesión y encontrar apoyo. Ruega por nosotros; alcánzanos de Dios todo lo que necesitamos. Lo pedimos también nosotros al Dador de todo bien, por Jesucristo nuestro Señor.
+            
+            Para que seamos siempre testigos de la fe en medio del mundo, Roguemos al Señor.
+            Para que pasemos nuestra vida amando a Dios y a la Iglesia, Roguemos  al Señor.
+            Para que en nuestra sociedad, orgullosa y lanzada a poseer más, seamos testigos de otros valores, como lo fue el Padre Pío, Roguemos al Señor.`,
+    ]
+        
+    const novenaPadrePio = crearDiasNovena(lecturaDiasPadrePio, meditacionDiasPadrePio, OracionInicioNovenaPadrePio, OracionFinNovenaPadrePio);
+
+//Novena de Santa Teresa de Jesús
+    // Creando mapas para la novena de Santa Teresa de Jesús
+    // Creando mapas para la novena del perdón
+    const lecturaDiasSantaTeresa = [
+        `Alma, buscarte has en Mí,
+            y a Mí buscarme has en ti.
+
+            De tal suerte pudo amor,
+            alma, en mí te retratar,
+            que ningún sabio pintor
+            supiera con tal primor
+            tal imagen estampar.
+
+            Fuiste por amor criada
+            hermosa, bella, y así
+            en mis entrañas pintada,
+            si te perdieres, mi amada,
+            Alma, buscarte has en Mí.
+
+            Que yo sé que te hallarás
+            en mi pecho retratada,
+            y tan al vivo sacada,
+            que si te ves te holgarás,
+            viéndote tan bien pintada.
+
+            Y si acaso no supieres
+            dónde me hallarás a Mí,
+            No andes de aquí para allí,
+            sino, si hallarme quisieres,
+            a Mí buscarme has en ti.
+
+            Porque tú eres mi aposento,
+            eres mi casa y morada,
+            y así llamo en cualquier tiempo,
+            si hallo en tu pensamiento
+            estar la puerta cerrada.
+
+            Fuera de ti no hay buscarme,
+            porque para hallarme a Mí,
+            bastará solo llamarme,
+            que a ti iré sin tardarme
+            y a Mí buscarme has en ti.`,
+        `Ya toda me entregué y dí,
+            y de tal suerte he trocado,
+            que mi Amado es para mí
+            y yo soy para mi Amado.
+
+            Cuando el dulce Cazador
+            me tiró y dejó herida,
+            en los brazos del amor
+            mi alma quedó rendida;
+            y, cobrando nueva vida,
+            de tal manera he trocado,
+            que mi Amado es para mí
+            y yo soy para mi Amado.
+
+            Hirióme con una flecha
+            enherbolada de amor,
+            y mi alma quedó hecha
+            una con su Criador;
+            Ya yo no quiero otro amor,
+            pues a mi Dios me he entregado,
+            que es mi Amado para mí
+            y yo soy para mi Amado.`,
+        `Mirad bien 
+            cuán presto se mudan las personas, 
+            y cuán poco hay que fiar de ellas, 
+            y ansí asirse bien de Dios, 
+            que no se muda.`,
+        `En todas las cosas criadas
+            busqué la providencia de Dios y sabiduría
+            y en todas le alabé.`,
+        `¡Oh, Hermosura que excedéis
+            a todas las hermosuras!
+
+            Sin herir, dolor hacéis,
+            y sin dolor deshacéis
+            el amor de las criaturas.
+            
+            ¡Oh, nudo que así juntáis
+            dos cosas tan desiguales!
+            
+            No sé por qué os desatáis,
+            pues atado fuerza dais
+            a tener por bien los males.
+            
+            Juntáis quien no tiene ser
+            con el Ser que no se acaba;
+            sin acabar acabáis,
+            sin tener que amar amáis,
+            engrandecéis nuestra nada`,
+        `Nada te turbe,
+            nada te espante,
+            todo se pasa,
+            Dios no se muda.
+
+            La paciencia
+            todo lo alcanza;
+            quien a Dios tiene
+            nada le falta:
+            Sólo Dios basta.
+
+            Eleva el pensamiento,
+            al cielo sube,
+            por nada te acongojes,
+            nada te turbe.
+
+            A Jesucristo sigue
+            con pecho grande,
+            y, venga lo que venga,
+            nada te espante.
+
+            ¿Ves la gloria del mundo?
+            Es gloria vana;
+            nada tiene de estable,
+            todo se pasa.
+
+            Aspira a lo celeste,
+            que siempre dura;
+            fiel y rico en promesas,
+            Dios no se muda.
+
+            Ámala cual merece
+            Bondad inmensa;
+            pero no hay amor fino
+            sin la paciencia.
+
+            Confianza y fe viva
+            mantenga el alma,
+            que quien cree y espera
+            todo lo alcanza.
+
+            Del infierno acosado
+            aunque se viere,
+            burlará sus furores
+            quien a Dios tiene.
+
+            Vénganle desamparos,
+            cruces, desgracias;
+            siendo Dios su tesoro,
+            nada le falta.
+
+            Id, pues, bienes del mundo;
+            id, dichas vanas,
+            aunque todo lo pierda,
+            sólo Dios basta.`,
+        `Si el amor que me tenéis, 
+            Dios mío, es como el que os tengo,
+            decidme: ¿en qué me detengo? 
+            O Vos, ¿en qué os detenéis?
+
+            —Alma, ¿qué quieres de mí?
+            —Dios mío, no más que verte.
+            —Y ¿qué temes más de ti?
+            —Lo que más temo es perderte.
+
+            Un alma en Dios escondida
+            ¿qué tiene que desear,
+            sino amar y más amar,
+            y en amor toda escondida
+            tornarte de nuevo a amar?
+
+            Un amor que ocupe os pido,
+            Dios mío, mi alma os tenga,
+            para hacer un dulce nido
+            adonde más la convenga.`,
+        `Vivo sin vivir en mí,
+            y tan alta vida espero,
+            que muero porque no muero.
+
+            Vivo ya fuera de mí,
+            después que muero de amor;
+            porque vivo en el Señor,
+            que me quiso para sí:
+            cuando el corazón le di
+            puso en él este letrero,
+            que muero porque no muero.
+
+            Esta divina prisión,
+            del amor en que yo vivo,
+            ha hecho a Dios mi cautivo,
+            y libre mi corazón;
+            y causa en mí tal pasión
+            ver a Dios mi prisionero,
+            que muero porque no muero.
+
+            ¡Ay, qué larga es esta vida!
+            ¡Qué duros estos destierros,
+            esta cárcel, estos hierros
+            en que el alma está metida!
+            Solo esperar la salida
+            me causa dolor tan fiero,
+            que muero porque no muero.
+
+            ¡Ay, qué vida tan amarga
+            do no se goza el Señor!
+            Porque si es dulce el amor,
+            no lo es la esperanza larga:
+            quíteme Dios esta carga,
+            más pesada que el acero,
+            que muero porque no muero.
+
+            Solo con la confianza
+            vivo de que he de morir,
+            porque muriendo el vivir
+            me asegura mi esperanza;
+            muerte do el vivir se alcanza,
+            no te tardes, que te espero,
+            que muero porque no muero.
+
+            Mira que el amor es fuerte;
+            vida, no me seas molesta,
+            mira que solo me resta,
+            para ganarte perderte.
+            Venga ya la dulce muerte,
+            el morir venga ligero
+            que muero porque no muero.
+
+            Aquella vida de arriba,
+            que es la vida verdadera,
+            hasta que esta vida muera,
+            no se goza estando viva:
+            muerte, no me seas esquiva;
+            viva muriendo primero,
+            que muero porque no muero.
+
+            Vida, ¿qué puedo yo darle
+            a mi Dios que vive en mí,
+            si no es el perderte a ti,
+            para merecer ganarle?
+            Quiero muriendo alcanzarle,
+            pues tanto a mi Amado quiero,
+            que muero porque no muero.`,
+        `Vuestra soy, para Vos nací,
+            ¿qué mandáis hacer de mí?
+
+            Soberana Majestad,
+            eterna sabiduría,
+            bondad buena al alma mía;
+            Dios alteza, un ser, bondad,
+            la gran vileza mirad
+            que hoy os canta amor así:
+            ¿qué mandáis hacer de mí?
+
+            Vuestra soy, pues me criastes,
+            vuestra, pues me redimistes,
+            vuestra, pues que me sufristes,
+            vuestra, pues que me llamastes,
+            vuestra, porque me esperastes,
+            vuestra, pues no me perdí:
+            ¿qué mandáis hacer de mí?
+
+            ¿Qué mandáis, pues, buen Señor,
+            que haga tan vil criado?
+            ¿Cuál oficio le habéis dado
+            a este esclavo pecador?
+            Veisme aquí, mi dulce Amor,
+            amor dulce, veisme aquí:
+            ¿qué mandáis hacer de mí?
+
+            Veis aquí mi corazón,
+            yo le pongo en vuestra palma,
+            mi cuerpo, mi vida y alma,
+            mis entrañas y afición;
+            dulce Esposo y redención,
+            pues por vuestra me ofrecí:
+            ¿qué mandáis hacer de mí?
+
+            Dadme muerte, dadme vida:
+            dad salud o enfermedad,
+            honra o deshonra me dad,
+            dadme guerra o paz crecida,
+            flaqueza o fuerza cumplida,
+            que a todo digo que sí:
+            ¿qué mandáis hacer de mí?
+
+            Dadme riqueza o pobreza,
+            dad consuelo o desconsuelo,
+            dadme alegría o tristeza,
+            dadme infierno o dadme cielo,
+            vida dulce, sol sin velo,
+            pues del todo me rendí:
+            ¿qué mandáis hacer de mí?
+
+            Si queréis, dadme oración,
+            si no, dadme sequedad,
+            si abundancia y devoción,
+            y si no esterilidad.
+            Soberana Majestad,
+            solo hallo paz aquí:
+            ¿qué mandáis hacer de mí?
+
+            Dadme, pues, sabiduría,
+            o por amor, ignorancia;
+            dadme años de abundancia,
+            o de hambre y carestía;
+            dad tiniebla o claro día,
+            revolvedme aquí o allí:
+            ¿qué mandáis hacer de mí?
+
+            Si queréis que esté holgando,
+            quiero por amor holgar.
+            Si me mandáis trabajar,
+            morir quiero trabajando.
+            Decid, ¿dónde, cómo y cuándo?
+            Decid, dulce Amor, decid:
+            ¿qué mandáis hacer de mí?
+
+            Dadme Calvario o Tabor,
+            desierto o tierra abundosa;
+            sea Job en el dolor,
+            o Juan que al pecho reposa;
+            sea viña fructuosa
+            o estéril, si cumple así:
+            ¿qué mandáis hacer de mí?
+
+            Sea José puesto en cadenas,
+            o de Egipto adelantado,
+            o David sufriendo penas,
+            o ya David encumbrado;
+            sea Jonás anegado,
+            o libertado de allí:
+            ¿qué mandáis hacer de mí?
+
+            Esté callando o hablando,
+            haga fruto o no le haga,
+            muéstreme la ley mi llaga,
+            goce de Evangelio blando;
+            esté penando o gozando,
+            solo vos en mí vivid:
+            ¿qué mandáis hacer de mí?
+
+            Vuestra soy, para vos nací,
+            ¿qué mandáis hacer de mí?`,
+    ]
+    
+    const tituloDiasSantaTeresa = [
+        "Búscate en mí",
+        "Es mi Amado para mí, y yo soy para mi Amado",
+        "Asirse bien de Dios",
+        "En todas las cosas criadas",
+        "Oh, Hermosura, que excedéis todas las hermosuras",
+        "Nada te turbe",
+        "Un alma en Dios escondida",
+        "Vivo sin vivir en mí",
+        "Vuestra soy, para Vos nací",
+    ];
+
+    const meditacionDiasSantaTeresa = [
+        `Padre Amado, no permitas que me busque en el mundo, que me da una imagen errónea, reducida, opaca... de mi vida. Hazme buscarme en Ti, donde podré ver la grandeza con la que me has creado y a la que me llamas. Tampoco permitas que te busque a Ti fuera, sino en la dulce intimidad de mi corazón, pues Tú no estás fuera, sino dentro. 
+            Amén.`,
+        `Esposo Amadísimo, ¿qué hay más bello que esto? Desde que tus flechas me alcanzaron, Tú eres para mí. Todo Tú. Y yo soy para Ti, todo yo. No permitas que esta unión se enturbie por el pecado, antes bien purifícala cada día, de modo que lleguemos al deseado Desposorio Místico. 
+            Amén.`,
+        `Espíritu Santo muy Amado, no dejes de iluminarme para que pueda asirme a Ti, y al Padre y al Hijo. Los únicos eternos, los únicos que no decepcionáis, la única roca. Agárrame y no me sueltes, agárrete yo y no te suelte, pues solo Tú eres el Dios de la vida.
+            Amén.`,
+        `Santa Trinidad, tres veces Amada. Seas bendita por los siglos, pues todo está lleno de Ti. Toda la creación exhala tus aromas, en toda estás. No permitas nunca que deje de ver en ella tu Amor y Sabiduría, ni que las confunda contigo.
+            Amén.`,
+        `¡Oh, hermosura, que excedéis a todas las hermosuras! ¿Cómo no amarte? No nos desates, pues atado fuerza das. Úneme a Ti, átame fuerte, Padre mío, engrandece mi nada.
+            Amén.`,
+        `Padre Amado, no permitas que nada me turbe ni me espante ¡Mira que soy tan pequeño que todo me da miedo! Llena mi corazón, de modo que solo pueda decir "Solo Dios basta".
+            Amén.`,
+        `Esposo mío, merecedor de todo Amor, esconde mi alma en Ti. No quiero brillar si no es tu luz, no quiero aparecer si no me lo pides Tú. Escóndeme en lo escondido de tu tienda, donde pueda amar y más amar y tornarte de nuevo a amar. A Ti. Solo a Ti.
+            Amén.`,
+        `Espíritu Santo Paráclito, mi Amado Defensor, dame fuerzas para llevar la largueza de esta vida, que toda ella sea preparación para el encuentro con vosotros, no me pierda yo en las vanidades, ni desespere por el Amor Tuyo, te ruego que la espera aquilate el Amor y el tiempo la Dilate... y si a bien lo tienes, no me hagas esperar demasiado.
+            Amén.`,
+        `Amadísima y Eterna Trinidad, vuestro soy, para vos nací, ¿qué mandas hacer de mí? Mándame donde quieras, dame lo que me pides y pídeme lo que quieras, haz en mí lo que quieras. A Ti me entrego, a Ti me doy. "Solo hallo paz aquí ¿Qué mandáis hacer de mí?" No permitas que sea esclavo de mi voluntad, tirana y errada, hazme esclavo Tuyo ahora y para siempre.
+            Amén.`,
+    ];
+        
+    const novenaSantaTeresa = crearDiasNovena(lecturaDiasSantaTeresa, meditacionDiasSantaTeresa, GLORIA, PADRE_NUESTRO, tituloDiasSantaTeresa);
+
+    //Agrupación del contenido de las novenas
 const contenidoNovenas = {
     abandono: {
         coronilla: coronillaAbandono,
@@ -1721,11 +1799,24 @@ const contenidoNovenas = {
         oracion: null,
         letanias: null
     },
-    Perdon: {
+    perdon: {
         coronilla: coronillaPerdon,
         novena: novenaPerdon,
         oracion: Salmo50,
         letanias: LetaniasPenitenciales
+    },
+    padre_pio: {
+        coronilla: null,
+        novena: novenaPadrePio,
+        oracion: OracionPadrePio,
+        letanias: null
+    },
+        santa_teresa: {
+        coronilla: null,
+        novena: novenaSantaTeresa,
+        oracion: null,
+        letanias: null
     }
+
 };
 
