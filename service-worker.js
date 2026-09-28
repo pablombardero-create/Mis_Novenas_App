@@ -1,4 +1,4 @@
-const SW_VERSION = "1.2.4";
+const SW_VERSION = "2.0.1";
 const CACHE_NAME = "novenas-cache-" + SW_VERSION; // ✅ cambia con cada versión
 const ARCHIVOS = [
     "./index.html",
